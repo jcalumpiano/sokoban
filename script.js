@@ -39,58 +39,77 @@ function loadWallsFromTemplate(template) {
         columns.forEach((cell, colIndex) => {
             if (cell.trim() === wallSymbol) {
                 // Create a block at the rowIndex, colIndex position
-                wallBlocks.push( new Wall(colIndex*gridSize, rowIndex*gridSize, "red", gridSize));
+                wallBlocks.push( new Wall(colIndex*gridSize, rowIndex*gridSize, "red", gridSize, "img/wall.png"));
             }else if(cell.trim() === boxSymbol){
-                moveableBoxes.push(new MoveableBox(colIndex*gridSize, rowIndex*gridSize, "green", gridSize))
-            }else if(cell.trim() === playerSymbol){
-                player = new Player(colIndex*gridSize, rowIndex*gridSize, "blue", gridSize)
+                moveableBoxes.push(new MoveableBox(colIndex*gridSize, rowIndex*gridSize, "green", gridSize, "img/block.png"))
             }else if(cell.trim() === targetSymbol){
-                targets.push(new Target(colIndex*gridSize, rowIndex*gridSize, "yellow", gridSize))
+                targets.push(new Target(colIndex*gridSize, rowIndex*gridSize, "yellow", gridSize, "img/mark.png"))
+            }else if(cell.trim() === playerSymbol){
+                player = new Player(colIndex*gridSize, rowIndex*gridSize, "blue", gridSize, "img/char.png")
             }
         });
     });
 
 }
 
-function Wall(x, y, color, size){
+function Wall(x, y, color, size, image){
     this.x=x;
     this.y=y;  
     this.color=color;
     this.size=size;
     this.drawWallBlock = function (){
         ctx = gameArea.context;
-        ctx.fillStyle = color;
-        ctx.fillRect(this.x, this.y, this.size, this.size);
+        if (image != null) {
+            this.image = new Image();
+            this.image.src = image;
+            ctx.drawImage(this.image, this.x, this.y, this.size, this.size);
+        }else{
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.size, this.size);
+        }
     }
 }
 
-function Target(x, y, color, size){
+function Target(x, y, color, size, image){
     this.x=x;
     this.y=y;  
     this.color=color;
     this.size=size;
     this.drawTarget = function (){
-        ctx = gameArea.context;
-        ctx.fillStyle = color;
-        ctx.fillRect(this.x, this.y, this.size, this.size);
+        if (image != null) {
+            this.image = new Image();
+            this.image.src = image;
+            ctx.drawImage(this.image, this.x, this.y, this.size, this.size);
+        }else{
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.size, this.size);
+        }
     }
 }
 
-function Player(x, y, color, size){
+function Player(x, y, color, size, image){
     this.x=x;
     this.y=y;
     this.speedX = gridSize;
     this.speedY = gridSize;   
     this.color=color;
+    if (image != null) {
+        this.image = new Image();
+        this.image.src = image;
+    }
     this.size=size;
     this.update = function(){
         ctx = gameArea.context;
-        ctx.fillStyle = color;
-        ctx.fillRect(this.x, this.y, this.size, this.size);    
+        if (image != null) {
+            ctx.drawImage(this.image, this.x, this.y, this.size, this.size);
+        }else{
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.size, this.size);    
+        }
     }
 }
 
-function MoveableBox(x, y, color, size){
+function MoveableBox(x, y, color, size, image){
     this.x=x;
     this.y=y;
     this.speedX = gridSize;
@@ -98,25 +117,28 @@ function MoveableBox(x, y, color, size){
     this.color=color;
     this.size=size;
     this.id = Date.now()*(Math.floor(Math.random() * 100))
+    if (image != null) {
+        this.image = new Image();
+        this.image.src = image;
+    }
     this.update = function(){
         ctx = gameArea.context;
-        ctx.fillStyle = color;
-        ctx.fillRect(this.x, this.y, this.size, this.size);    
+        if (image != null) {
+            ctx.drawImage(this.image, this.x, this.y, this.size, this.size);
+        }else{
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.size, this.size);    
+        }
     };
-    this.drawBox = function (){
-        ctx = gameArea.context;
-        ctx.fillStyle = color;
-        ctx.fillRect(this.x, this.y, this.size, this.size);
-    }
 }
 
 function updateGameArea() {
     gameArea.clear();
-    drawWalls();
     let playerMoved = movePlayer();
     if (playerMoved){
         moveCounter.incrementMove()
     }
+    drawWalls();
     checkWin();
 } 
 
@@ -130,8 +152,10 @@ function drawWalls() {
     }
 
     for (let box of moveableBoxes) {
-        box.drawBox();
+        box.update();
     }
+
+    player.update();
 }
 
 function movePlayer(){
@@ -284,7 +308,6 @@ function pushBox(movement, box){
 let round1 = new Template(round1Template)
 
 function startGame() {   
-    // gameArea = document.getElementById("gameArea") ;
     gameArea.start(round1);
     moveCounter.setMoveCount(0)
     updateGameArea()
