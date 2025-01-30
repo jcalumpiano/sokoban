@@ -41,7 +41,7 @@ function loadWallsFromTemplate(template) {
                 // Create a block at the rowIndex, colIndex position
                 wallBlocks.push( new Wall(colIndex*gridSize, rowIndex*gridSize, "red", gridSize, "img/wall.png"));
             }else if(cell.trim() === boxSymbol){
-                moveableBoxes.push(new MoveableBox(colIndex*gridSize, rowIndex*gridSize, "green", gridSize, "img/block.png"))
+                moveableBoxes.push(new MoveableBox(colIndex*gridSize, rowIndex*gridSize, "green", gridSize, "img/block.png", "white", "img/blockmarked.png"))
             }else if(cell.trim() === targetSymbol){
                 targets.push(new Target(colIndex*gridSize, rowIndex*gridSize, "yellow", gridSize, "img/mark.png"))
             }else if(cell.trim() === playerSymbol){
@@ -109,7 +109,7 @@ function Player(x, y, color, size, image){
     }
 }
 
-function MoveableBox(x, y, color, size, image){
+function MoveableBox(x, y, color, size, image, markedColor, markedImage){
     this.x=x;
     this.y=y;
     this.speedX = gridSize;
@@ -121,6 +121,10 @@ function MoveableBox(x, y, color, size, image){
         this.image = new Image();
         this.image.src = image;
     }
+    if (markedImage != null) {
+        this.markedImage = new Image();
+        this.markedImage.src = markedImage;
+    }
     this.update = function(){
         ctx = gameArea.context;
         if (image != null) {
@@ -130,6 +134,14 @@ function MoveableBox(x, y, color, size, image){
             ctx.fillRect(this.x, this.y, this.size, this.size);    
         }
     };
+    this.markBox = function(){
+        if (markedImage != null) {
+            ctx.drawImage(this.markedImage, this.x, this.y, this.size, this.size);
+        }else{
+            ctx.fillStyle = markedColor;
+            ctx.fillRect(this.x, this.y, this.size, this.size);    
+        }
+    }
 }
 
 function updateGameArea() {
@@ -212,6 +224,7 @@ function checkWin(){
         for (let box of moveableBoxes){
             if (box.x == target.x && box.y == target.y){
                 score = score + 1
+                box.markBox();
                 continue;
             }
         }
