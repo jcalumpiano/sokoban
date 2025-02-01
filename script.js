@@ -5,14 +5,15 @@ let targets = [];
 
 
 function GameArea () {
+    
     this.canvas = document.createElement("canvas")
-    this.start = function(round) {
+    this.start = function(level) {
         //set canvas dimensions
-        this.canvas.width = round.canvasWidth*gridSize;
-        this.canvas.height = round.canvasHeight*gridSize;
+        this.canvas.width = level.canvasWidth*gridSize;
+        this.canvas.height = level.canvasHeight*gridSize;
         this.context = this.canvas.getContext("2d");
         // this.interval = setInterval(updateGameArea, 20);
-        loadWallsFromTemplate(round.template);
+        loadWallsFromTemplate(level.template);
         window.addEventListener("keydown", function(event){
             updateGameArea()
             gameArea.key = event.key;
@@ -21,9 +22,15 @@ function GameArea () {
             updateGameArea()
             gameArea.key = false;
         })
+        
+        
     },
     this.clear = function(){
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    },
+    this.restart = function(level){
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        loadWallsFromTemplate(level.template);
     }
 }
 
@@ -326,6 +333,12 @@ function startGame() {
     updateGameArea()
 }
 
+function restartLevel(level) {
+    gameArea.restart(round1);
+    moveCounter.setMoveCount(0)
+    updateGameArea()
+}
+
 
 // =====================================================================================================
 
@@ -375,11 +388,16 @@ function createGameScreeen(){
     navLeft.classList.add("navLeft");
 
     moveCounter = new MoveCounter();
-
     divMoveCounter = moveCounter.container
     divMoveCounter.id = "divMoveCounter";
 
-    navRight.append(divMoveCounter)
+    let restartButton = createButton("buttonResetLevel", "Reset", 
+        function(){
+            restartLevel();
+        });
+    
+    navRight.append(divMoveCounter);
+    navRight.append(restartButton.getButton);
     
     mainArea.append(navLeft)
     mainArea.append(gameArea.canvas);
@@ -389,6 +407,17 @@ function createGameScreeen(){
     container.appendChild(mainArea);
 
     document.body.appendChild(container);
+}
+
+function createButton(id, text, onclick) {
+    let button = document.createElement("button");
+    button.id = id;
+    button.innerHTML = text;
+    button.onclick = onclick;
+
+    return {
+        getButton: button
+    }
 }
 
 createGameScreeen();
