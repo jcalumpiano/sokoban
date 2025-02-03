@@ -2,16 +2,16 @@ const gridSize = 30;
 let wallBlocks = [];
 let moveableBoxes = [];
 let targets = [];
-
+var currentLevel;
 
 function GameArea () {
     
     this.canvas = document.createElement("canvas")
+    this.context = this.canvas.getContext("2d");
     this.start = function(level) {
         //set canvas dimensions
         this.canvas.width = level.canvasWidth*gridSize;
         this.canvas.height = level.canvasHeight*gridSize;
-        this.context = this.canvas.getContext("2d");
         // this.interval = setInterval(updateGameArea, 20);
         loadWallsFromTemplate(level.template);
         window.addEventListener("keydown", function(event){
@@ -22,13 +22,13 @@ function GameArea () {
             updateGameArea()
             gameArea.key = false;
         })
-        
-        
     },
     this.clear = function(){
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     },
     this.restart = function(level){
+        this.canvas.width = level.canvasWidth*gridSize;
+        this.canvas.height = level.canvasHeight*gridSize;
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         loadWallsFromTemplate(level.template);
     }
@@ -239,6 +239,7 @@ function checkWin(){
     
     if (score == targets.length){
         hasPlayerWon = true;
+
         showWinScreen();
     }
 
@@ -325,20 +326,33 @@ function pushBox(movement, box){
 
 }
 
-let round1 = new Template(round1Template)
 
-function startGame() {   
-    gameArea.start(round1);
+
+function startGame(level) { 
+    let round = new Template(level.levelTemplate)  
+    gameArea.start(round);
     moveCounter.setMoveCount(0)
     updateGameArea()
+    currentLevel = level
 }
 
 function restartLevel(level) {
-    gameArea.restart(round1);
+    gameArea.restart(level);
     moveCounter.setMoveCount(0)
     updateGameArea()
 }
 
+function selectLevel(level) {
+    let chosenLevel = new Level(level)  
+    if (!currentLevel){
+        gameArea.start(chosenLevel);
+    }else {
+        gameArea.restart(chosenLevel);
+    }
+    currentLevel = chosenLevel
+    moveCounter.setMoveCount(0)
+    updateGameArea()
+}
 
 // =====================================================================================================
 
@@ -393,11 +407,15 @@ function createGameScreeen(){
 
     let restartButton = createButton("buttonResetLevel", "Reset", 
         function(){
-            restartLevel();
+            restartLevel(currentLevel);
         });
+
+    let levelSelector = createLevelSelector();
+
     
     navRight.append(divMoveCounter);
     navRight.append(restartButton.getButton);
+    navRight.append(levelSelector.getDropdownArea);
     
     mainArea.append(navLeft)
     mainArea.append(gameArea.canvas);
@@ -420,6 +438,33 @@ function createButton(id, text, onclick) {
     }
 }
 
-createGameScreeen();
+function createLevelSelector(){
+    let dropdownArea = document.createElement("div");
+    let dropdownButton = createButton("buttonLevelSelect", "Select Level", function()
+        {
+            document.getElementById("dropdownContent").classList.toggle("show");
+        });
 
-startGame();
+    let dropdownContent = document.createElement("div");
+    dropdownContent.id = "dropdownContent";
+    dropdownContent.classList.add("dropdownContent");
+
+    levels.forEach((level) => {
+        let levelButton = createButton(level.levelName, level.levelName, function(){selectLevel(level)})
+
+        dropdownContent.appendChild(levelButton.getButton)
+    });
+
+    dropdownArea.append(dropdownButton.getButton);
+    dropdownArea.append(dropdownContent);
+    
+    return{
+        getDropdownArea: dropdownArea
+    }
+
+}
+
+createGameScreeen();
+// tem = new round1Template()
+// let round = new Template(tem.levelTemplate)  
+// startGame(round);

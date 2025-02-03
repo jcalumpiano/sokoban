@@ -63,3 +63,12 @@ div{
     flex-direction: column;
 }
 
+.dropdownContent {
+    display: none;
+    flex-direction: column;
+    padding: 10px 0px 10px 0px;
+}
+
+.show {
+    display: flex;
+}
