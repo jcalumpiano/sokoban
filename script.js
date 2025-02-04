@@ -14,6 +14,7 @@ function GameArea () {
         this.canvas.height = level.canvasHeight*gridSize;
         // this.interval = setInterval(updateGameArea, 20);
         loadWallsFromTemplate(level.template);
+        updateGameArea()
         window.addEventListener("keydown", function(event){
             updateGameArea()
             gameArea.key = event.key;
@@ -312,7 +313,9 @@ function pushBox(movement, box){
         default:
             return;
     }
-    if(newX<0 || newY<0){
+
+    // check if pushing the box moves it outside the border
+    if(newX<0 || newY<0 || newX>=gameArea.canvas.width || newY>=gameArea.canvas.height){
         newX = Math.max(0, Math.min(newX, gameArea.canvas.width - box.size))
         newY = Math.max(0, Math.min(newY, gameArea.canvas.height - box.size))
     }else if (!isHittingWall(newX, newY) && !isHittingOtherBox(box, newX, newY)) {
