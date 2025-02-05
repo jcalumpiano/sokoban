@@ -14,7 +14,7 @@ function GameArea () {
         this.canvas.height = level.canvasHeight*gridSize;
         // this.interval = setInterval(updateGameArea, 20);
         loadWallsFromTemplate(level.template);
-        updateGameArea()
+        updateGameArea();
         window.addEventListener("keydown", function(event){
             updateGameArea()
             gameArea.key = event.key;
@@ -23,6 +23,7 @@ function GameArea () {
             updateGameArea()
             gameArea.key = false;
         })
+        
     },
     this.clear = function(){
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -32,6 +33,7 @@ function GameArea () {
         this.canvas.height = level.canvasHeight*gridSize;
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         loadWallsFromTemplate(level.template);
+        updateGameArea()
     }
 }
 
@@ -160,6 +162,7 @@ function updateGameArea() {
     }
     drawWalls();
     checkWin();
+    disableCurrentLevelButton();
 } 
 
 function drawWalls() {
@@ -332,11 +335,11 @@ function pushBox(movement, box){
 
 
 function startGame(level) { 
-    let round = new Template(level.levelTemplate)  
-    gameArea.start(round);
+    let chosenLevel = new Level(level)  
+    gameArea.start(chosenLevel);
     moveCounter.setMoveCount(0)
+    currentLevel = chosenLevel
     updateGameArea()
-    currentLevel = level
 }
 
 function restartLevel(level) {
@@ -352,9 +355,22 @@ function selectLevel(level) {
     }else {
         gameArea.restart(chosenLevel);
     }
-    currentLevel = chosenLevel
-    moveCounter.setMoveCount(0)
-    updateGameArea()
+    moveCounter.setMoveCount(0);
+    currentLevel = chosenLevel    
+    updateGameArea();  
+}
+
+function disableCurrentLevelButton() {
+    let levelSelectorButtons = document.getElementById("levelSelector").children
+    if(levelSelectorButtons){
+        for (let button of levelSelectorButtons){
+            button.disabled=false;
+        }
+    }
+    if (currentLevel){
+        let button = document.getElementById(currentLevel.levelName);
+        button.disabled = true;
+    }
 }
 
 // =====================================================================================================
@@ -434,7 +450,11 @@ function createButton(id, text, onclick) {
     let button = document.createElement("button");
     button.id = id;
     button.innerHTML = text;
-    button.onclick = onclick;
+    button.onclick = function(){
+        onclick()
+        // remove keyboard focus from button after clicking
+        button.blur()
+    };
 
     return {
         getButton: button
@@ -445,11 +465,11 @@ function createLevelSelector(){
     let dropdownArea = document.createElement("div");
     let dropdownButton = createButton("buttonLevelSelect", "Select Level", function()
         {
-            document.getElementById("dropdownContent").classList.toggle("show");
+            document.getElementById("levelSelector").classList.toggle("show");
         });
 
     let dropdownContent = document.createElement("div");
-    dropdownContent.id = "dropdownContent";
+    dropdownContent.id = "levelSelector";
     dropdownContent.classList.add("dropdownContent");
 
     levels.forEach((level) => {
@@ -467,7 +487,21 @@ function createLevelSelector(){
 
 }
 
+function createPopup(message) {
+    let background = document.createElement("div");
+    background.classList.add("overlay")
+    background.classList.toggle("hide")
+    let popupDiv = document.createElement("div");
+    popupDiv.classList.add("divPopup")
+    background.classList.toggle("hide")
+
+
+    popupDiv.innerHTML = message;
+    document.body.append(background);
+    document.body.append(popupDiv);
+
+}
+
 createGameScreeen();
-// tem = new round1Template()
-// let round = new Template(tem.levelTemplate)  
-// startGame(round);
+createPopup("Reset?")
+startGame(levels[0]);

@@ -25,6 +25,10 @@ button{
     padding: 5px;
 }
 
+button :disabled{
+    color:white;
+}
+
 .mainContainer {
     height: 100vh;
     width: 100%;
@@ -76,4 +80,30 @@ button{
 
 .show {
     display: flex;
+}
+
+.overlay {
+	z-index: 1;
+	position: absolute;
+	background: black;
+	height: 100vh;
+	width: 100%;
+	top: 0;
+	opacity: 30%;
+	display: none;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.divPopup {
+	color: black;
+	z-index: 4;
+	background: white;
+	position: absolute;
+	top: 50%;	
+    left: 50%;
+	height: 100px;
+	width: 400px;
+	margin: -50px -200px;
+	display: none;
 }
