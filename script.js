@@ -3,12 +3,14 @@ let wallBlocks = [];
 let moveableBoxes = [];
 let targets = [];
 var currentLevel;
+hasPlayerWon = false;
 
 function GameArea () {
     
     this.canvas = document.createElement("canvas")
     this.context = this.canvas.getContext("2d");
     this.start = function(level) {
+        hasPlayerWon = false
         //set canvas dimensions
         this.canvas.width = level.canvasWidth*gridSize;
         this.canvas.height = level.canvasHeight*gridSize;
@@ -16,12 +18,16 @@ function GameArea () {
         loadWallsFromTemplate(level.template);
         updateGameArea();
         window.addEventListener("keydown", function(event){
-            updateGameArea()
-            gameArea.key = event.key;
+            if(!hasPlayerWon){
+                updateGameArea()
+                gameArea.key = event.key;
+            }
         });
         window.addEventListener("keyup", function(){
-            updateGameArea()
-            gameArea.key = false;
+            if(!hasPlayerWon){
+                updateGameArea()
+                gameArea.key = false;
+            }
         })
         
     },
@@ -34,6 +40,7 @@ function GameArea () {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         loadWallsFromTemplate(level.template);
         updateGameArea()
+        hasPlayerWon = false
     }
 }
 
@@ -230,7 +237,7 @@ function movePlayer(){
 
 function checkWin(){
     let score = 0;
-    let hasPlayerWon = false;
+    // hasPlayerWon = false;
     for(let target of targets){
         for (let box of moveableBoxes){
             if (box.x == target.x && box.y == target.y){
@@ -243,16 +250,40 @@ function checkWin(){
     
     if (score == targets.length){
         hasPlayerWon = true;
-
         showWinScreen();
     }
 
 }
 
 function showWinScreen(){
-    loadWallsFromTemplate(winTemplate)
-    gameArea.clear();
-    drawWalls();
+    // loadWallsFromTemplate(winTemplate)
+    // gameArea.clear();
+    // drawWalls();
+    let nextLevelIndex = getNextLevelIndex(currentLevel.levelName)
+    let nextLevelButton;
+    
+    if(nextLevelIndex >= levels.length){
+        nextLevelButton = "Exit"
+        nextLevelFunction = function(){
+            hidePopup()
+        }
+    }else{
+        nextLevelButton = "Next Level"
+        nextLevelFunction = function(){
+            selectLevel(getLevelByIndex(nextLevelIndex))
+            hidePopup()
+        }
+    }
+    createPopup(
+        "You won!", "It took "+moveCount+" moves to win this level", "Play Again", nextLevelButton, 
+        function(){
+            gameArea.restart(currentLevel);
+            moveCounter.setMoveCount(0)
+            updateGameArea()
+            hidePopup()
+        }, 
+        nextLevelFunction
+    )
 }
 
 
@@ -335,16 +366,15 @@ function pushBox(movement, box){
 
 
 function startGame(level) { 
-    let chosenLevel = new Level(level)  
-    gameArea.start(chosenLevel);
+    gameArea.start(level);
     moveCounter.setMoveCount(0)
-    currentLevel = chosenLevel
+    currentLevel = level
     updateGameArea()
 }
 
 function restartLevel(level) {
     createPopup(
-        "Reset level?", "Yes", "Cancel", 
+        "Reset level?", "Your progress will be lost", "Yes", "Cancel", 
         function(){
             gameArea.restart(level);
             moveCounter.setMoveCount(0)
@@ -357,8 +387,7 @@ function restartLevel(level) {
     )
 }
 
-function selectLevel(level) {
-    let chosenLevel = new Level(level)  
+function selectLevel(chosenLevel) { 
     if (!currentLevel){
         gameArea.start(chosenLevel);
     }else {
@@ -496,7 +525,7 @@ function createLevelSelector(){
 
 }
 
-function createPopup(message, buttonLeftText, buttonRightText, function1, function2) {
+function createPopup(header, message, buttonLeftText, buttonRightText, function1, function2) {
     let background = document.createElement("div");
     background.classList.add("overlay");
     background.id = "popupContainer";
@@ -504,6 +533,10 @@ function createPopup(message, buttonLeftText, buttonRightText, function1, functi
     let popupDiv = document.createElement("div");
     popupDiv.classList.add("divPopup")
     popupDiv.id = "popupBox";
+
+    let popupHeaderDiv = document.createElement("div");
+    popupHeaderDiv.classList.add("popupHeaderDiv");
+    popupHeaderDiv.innerHTML = header;
 
     let popupMessageDiv = document.createElement("div");
     popupMessageDiv.classList.add("divPopupMessage");
@@ -517,8 +550,14 @@ function createPopup(message, buttonLeftText, buttonRightText, function1, functi
     let button2 = createButton(buttonRightText, buttonRightText, function2)
     button2.getButton.classList.add("popupButton");
 
-    buttonContainer.append(button1.getButton);
-    buttonContainer.append(button2.getButton);
+    if(buttonLeftText){
+        buttonContainer.append(button1.getButton);
+    }
+
+    if(buttonRightText){
+        buttonContainer.append(button2.getButton);
+    }
+    popupDiv.append(popupHeaderDiv);
     popupDiv.append(popupMessageDiv);
     popupDiv.append(buttonContainer);
     // background.classList.toggle("hide")

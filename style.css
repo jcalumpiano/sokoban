@@ -23,6 +23,7 @@ div{
 
 button{
     padding: 5px;
+    cursor: pointer;
 }
 
 button :disabled{
@@ -116,7 +117,7 @@ button :disabled{
 .divPopupButtonContainer {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: space-around;
     flex-grow: 2;
     height: 10px;
     width: 200px;
@@ -128,5 +129,11 @@ button :disabled{
 }
 
 .divPopupMessage {
-    flex-grow: 8;
+    flex-grow: 6;
+    color: #3c3c3c;
+}
+
+.popupHeaderDiv{
+    flex-grow: 2;
+    font-size: large;
 }
