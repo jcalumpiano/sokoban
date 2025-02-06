@@ -343,9 +343,18 @@ function startGame(level) {
 }
 
 function restartLevel(level) {
-    gameArea.restart(level);
-    moveCounter.setMoveCount(0)
-    updateGameArea()
+    createPopup(
+        "Reset level?", "Yes", "Cancel", 
+        function(){
+            gameArea.restart(level);
+            moveCounter.setMoveCount(0)
+            updateGameArea()
+            hidePopup()
+        }, 
+        function(){
+            hidePopup()
+        }
+    )
 }
 
 function selectLevel(level) {
@@ -487,21 +496,49 @@ function createLevelSelector(){
 
 }
 
-function createPopup(message) {
+function createPopup(message, buttonLeftText, buttonRightText, function1, function2) {
     let background = document.createElement("div");
-    background.classList.add("overlay")
-    background.classList.toggle("hide")
+    background.classList.add("overlay");
+    background.id = "popupContainer";
+
     let popupDiv = document.createElement("div");
     popupDiv.classList.add("divPopup")
-    background.classList.toggle("hide")
+    popupDiv.id = "popupBox";
 
+    let popupMessageDiv = document.createElement("div");
+    popupMessageDiv.classList.add("divPopupMessage");
+    popupMessageDiv.innerHTML = message;
 
-    popupDiv.innerHTML = message;
+    let buttonContainer = document.createElement("div");
+    buttonContainer.classList.add("divPopupButtonContainer");
+
+    let button1 = createButton(buttonLeftText, buttonLeftText, function1)
+    button1.getButton.classList.add("popupButton");
+    let button2 = createButton(buttonRightText, buttonRightText, function2)
+    button2.getButton.classList.add("popupButton");
+
+    buttonContainer.append(button1.getButton);
+    buttonContainer.append(button2.getButton);
+    popupDiv.append(popupMessageDiv);
+    popupDiv.append(buttonContainer);
+    // background.classList.toggle("hide")
+    
     document.body.append(background);
     document.body.append(popupDiv);
 
 }
 
+function hidePopup() {
+    let popupContainer = document.getElementById("popupContainer");
+    let popupBox = document.getElementById("popupBox");
+
+    document.body.removeChild(popupContainer);
+    document.body.removeChild(popupBox)
+}
+
+
+
+
 createGameScreeen();
-createPopup("Reset?")
+// createPopup("Reset?")
 startGame(levels[0]);

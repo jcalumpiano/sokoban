@@ -90,20 +90,43 @@ button :disabled{
 	width: 100%;
 	top: 0;
 	opacity: 30%;
-	display: none;
+	/* display: none; */
 	justify-content: center;
 	flex-direction: column;
 }
 
 .divPopup {
-	color: black;
-	z-index: 4;
-	background: white;
-	position: absolute;
-	top: 50%;	
+    color: black;
+    z-index: 4;
+    background: white;
+    position: absolute;
+    top: 50%;
     left: 50%;
-	height: 100px;
-	width: 400px;
-	margin: -50px -200px;
-	display: none;
+    height: 200px;
+    width: 400px;
+    margin: -240px -200px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    align-items: center;
+}
+
+.divPopupButtonContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-grow: 2;
+    height: 10px;
+    width: 200px;
+    margin: 0px 20px 0px 20px;
+}
+
+.popupButton {
+    min-width: 70px;
+}
+
+.divPopupMessage {
+    flex-grow: 8;
 }
