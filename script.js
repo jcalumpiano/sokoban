@@ -235,58 +235,6 @@ function movePlayer(){
     return playerMoved;
 }
 
-function checkWin(){
-    let score = 0;
-    // hasPlayerWon = false;
-    for(let target of targets){
-        for (let box of moveableBoxes){
-            if (box.x == target.x && box.y == target.y){
-                score = score + 1
-                box.markBox();
-                continue;
-            }
-        }
-    }
-    
-    if (score == targets.length){
-        hasPlayerWon = true;
-        showWinScreen();
-    }
-
-}
-
-function showWinScreen(){
-    // loadWallsFromTemplate(winTemplate)
-    // gameArea.clear();
-    // drawWalls();
-    let nextLevelIndex = getNextLevelIndex(currentLevel.levelName)
-    let nextLevelButton;
-    
-    if(nextLevelIndex >= levels.length){
-        nextLevelButton = "Exit"
-        nextLevelFunction = function(){
-            hidePopup()
-        }
-    }else{
-        nextLevelButton = "Next Level"
-        nextLevelFunction = function(){
-            selectLevel(getLevelByIndex(nextLevelIndex))
-            hidePopup()
-        }
-    }
-    createPopup(
-        "You won!", "It took "+moveCount+" moves to win this level", "Play Again", nextLevelButton, 
-        function(){
-            gameArea.restart(currentLevel);
-            moveCounter.setMoveCount(0)
-            updateGameArea()
-            hidePopup()
-        }, 
-        nextLevelFunction
-    )
-}
-
-
 function isHittingWall(newX, newY){
     for(let wallBlock of wallBlocks){
         if (newY == wallBlock.y && newX == wallBlock.x){
@@ -364,6 +312,55 @@ function pushBox(movement, box){
 }
 
 
+function checkWin(){
+    let score = 0;
+    // hasPlayerWon = false;
+    for(let target of targets){
+        for (let box of moveableBoxes){
+            if (box.x == target.x && box.y == target.y){
+                score = score + 1
+                box.markBox();
+                continue;
+            }
+        }
+    }
+    
+    if (score == targets.length){
+        hasPlayerWon = true;
+        showWinScreen();
+    }
+
+}
+
+
+function showWinScreen(){
+    let nextLevelIndex = getNextLevelIndex(currentLevel.levelName)
+    let nextLevelButton;
+    
+    if(nextLevelIndex >= levels.length){
+        nextLevelButton = "Exit"
+        nextLevelFunction = function(){
+            hidePopup()
+        }
+    }else{
+        nextLevelButton = "Next Level"
+        nextLevelFunction = function(){
+            selectLevel(getLevelByIndex(nextLevelIndex))
+            hidePopup()
+        }
+    }
+
+    createPopup(
+        "You won!", "It took you "+moveCount+" moves to win this level", "Play Again", nextLevelButton, 
+        function(){
+            gameArea.restart(currentLevel);
+            moveCounter.setMoveCount(0)
+            updateGameArea()
+            hidePopup()
+        }, 
+        nextLevelFunction
+    )
+}
 
 function startGame(level) { 
     gameArea.start(level);
@@ -466,13 +463,14 @@ function createGameScreeen(){
         function(){
             restartLevel(currentLevel);
         });
-
+    restartButton.getButton.classList.add("marginTop")
+        
     let levelSelector = createLevelSelector();
 
     
     navRight.append(divMoveCounter);
     navRight.append(restartButton.getButton);
-    navRight.append(levelSelector.getDropdownArea);
+    navLeft.append(levelSelector.getDropdownArea);
     
     mainArea.append(navLeft)
     mainArea.append(gameArea.canvas);
@@ -512,7 +510,7 @@ function createLevelSelector(){
 
     levels.forEach((level) => {
         let levelButton = createButton(level.levelName, level.levelName, function(){selectLevel(level)})
-
+        levelButton.getButton.classList.add("marginTop")
         dropdownContent.appendChild(levelButton.getButton)
     });
 
@@ -533,6 +531,10 @@ function createPopup(header, message, buttonLeftText, buttonRightText, function1
     let popupDiv = document.createElement("div");
     popupDiv.classList.add("divPopup")
     popupDiv.id = "popupBox";
+
+    let popupCloseButton = createButton("popupCloseButton", "&times;", function(){hidePopup()}).getButton;
+    popupCloseButton.classList.add("buttonClose");
+    popupCloseButton.classList.add("topRight");
 
     let popupHeaderDiv = document.createElement("div");
     popupHeaderDiv.classList.add("popupHeaderDiv");
@@ -557,6 +559,8 @@ function createPopup(header, message, buttonLeftText, buttonRightText, function1
     if(buttonRightText){
         buttonContainer.append(button2.getButton);
     }
+
+    popupDiv.append(popupCloseButton);
     popupDiv.append(popupHeaderDiv);
     popupDiv.append(popupMessageDiv);
     popupDiv.append(buttonContainer);

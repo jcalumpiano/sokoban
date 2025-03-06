@@ -1,3 +1,8 @@
+@font-face {
+    font-family: pixelatedFont;
+    src: url(fonts/slkscr.ttf);
+  }
+
 body {
     text-align: center;
     font-family: Arial, sans-serif;
@@ -21,10 +26,19 @@ div{
     border: none;
 }
 
-button{
+button{   
     padding: 5px;
     cursor: pointer;
+    border-width: 3px 3px 3px 3px;
+    border-color: #98989b;
+    border-style: solid;
+    font-family: pixelatedFont;
+    box-shadow: 0px 8px #6a6a6a;
 }
+
+/* button:hover {
+    border-width: 6px 4px 10px 4px;
+} */
 
 button :disabled{
     color:white;
@@ -40,7 +54,7 @@ button :disabled{
 .navBar {
     height: 50px;
     width: 100%;
-    background-color: black;
+    /* background-color: black; */
 }
 
 .mainArea {
@@ -69,14 +83,16 @@ button :disabled{
 .divMoveCounter {
     display: flex;
     justify-content: center;
-    padding: 20px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
     flex-direction: column;
+    font-family: pixelatedFont;
 }
 
 .dropdownContent {
     display: none;
     flex-direction: column;
     padding: 10px 0px 10px 0px;
+    position: relative;
 }
 
 .show {
@@ -97,35 +113,67 @@ button :disabled{
 }
 
 .divPopup {
-    color: black;
-    z-index: 4;
-    background: white;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    height: 200px;
-    width: 400px;
-    margin: -240px -200px;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    box-sizing: border-box;
-    border-radius: 10px;
-    align-items: center;
+	color: black;
+	z-index: 4;
+	background: #fdffb6;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	height: 200px;
+	width: 400px;
+	margin: -240px -200px;
+	display: flex;
+	flex-direction: column;
+	padding: 20px;
+	box-sizing: border-box;
+	align-items: center;
+	border-width: 3px 3px 3px 3px;
+	border-color: #a89f88;
+	border-style: solid;
+	font-family: pixelatedFont;
+	box-shadow: 0px 8px #4f4b37;
 }
 
 .divPopupButtonContainer {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    flex-grow: 2;
-    height: 10px;
-    width: 200px;
+    width: 80%;
     margin: 0px 20px 0px 20px;
 }
 
 .popupButton {
     min-width: 70px;
+}
+
+.buttonClose {
+	/* border: none; */
+	/* display: inline-block; */
+	padding: 8px px;
+	vertical-align: middle;
+	overflow: hidden;
+	text-decoration: none;
+	/* color: inherit; */
+	/* background-color: white; */
+	text-align: center;
+	cursor: pointer;
+	/* white-space: nowrap; */
+	height: 30px;
+	width: 30px;
+	/* border-radius: 10px; */
+	/* padding: 15px; */
+	/* box-sizing: border-box; */
+	margin: 5px;
+}
+
+/* .buttonClose:hover{
+    background-color: #e9e9ed;
+} */
+  
+.topRight {
+    position: absolute;
+    right: 0;
+    top: 0
 }
 
 .divPopupMessage {
@@ -137,3 +185,51 @@ button :disabled{
     flex-grow: 2;
     font-size: large;
 }
+
+.marginTop{
+    margin-top: 15px;
+}
+
+@media only screen and (max-width: 720px) {
+    .mainArea {
+      flex-direction: column;
+    }
+
+    .navRight{
+        width:500px;
+    }
+
+    .navLeft{
+        margin-bottom: 20px;
+    }
+
+    .dropdownContent{
+        position: absolute;
+    }
+
+    .navVertical{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+  }
+
+  @media only screen and (max-width: 520px) {
+    .mainArea {
+      flex-direction: column;
+    }
+
+    canvas{
+        width: 90%;
+    }
+
+    .navRight{
+        width:90%;
+    }
+
+    .divPopup{
+        width: 350px;
+        margin: -160px -175px;
+    }
+
+  }
