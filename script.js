@@ -455,7 +455,7 @@ function createGameScreeen(){
     navLeft.classList.add("navVertical");
     navLeft.classList.add("navLeft");
 
-    moveCounter = new MoveCounter();
+    moveCoufter = new MoveCounter();
     divMoveCounter = moveCounter.container
     divMoveCounter.id = "divMoveCounter";
 
