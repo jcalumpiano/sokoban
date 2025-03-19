@@ -10,24 +10,6 @@ let moveableBoxes = [];
 let targets = [];
 let player;
 
-function NavBar() {
-  return (
-    <div>Nav</div>
-  )
-}
-
-function NavLeft() {
-  return (
-    <div>NavL</div>
-  )
-}
-
-function NavRight() {
-  return (
-    <div>NavR</div>
-  )
-}
-
 const gridSize = 30;
 
 function GameArea() {
@@ -64,11 +46,10 @@ function GameArea() {
     })
     startGame();
     gameInitialized.current = true;
+
     drawWalls();
+
   }, [])
-
-
-
   return (
     <canvas ref={canvasRef}>GA</canvas>
   )
@@ -92,14 +73,6 @@ function loadWallsFromTemplate(template, context) {
     });
   });
 
-}
-
-
-function drawWalls() {
-  for (let wallBlock of wallBlocks) {
-      wallBlock.drawWallBlock();
-  }
-  player.update();
 }
 
 function updateGameArea(context) {
@@ -132,9 +105,25 @@ function movePlayer(context){
   if (context.key && context.key == "ArrowUp") {newY -= player.speedY; movement = "up"}
   if (context.key && context.key == "ArrowDown") {newY += player.speedY; movement = "down"}
 
-  player.x = newX;
-  player.y = newY;
-
+  // Check for collisions with blocks (walls)
+  let isWallHit = isHittingWall(newX, newY)
+  if (!isWallHit) {
+    // Check if next move hits box
+    let boxHit = isHittingBox(newX, newY);
+    if (boxHit){
+      //predict next box position
+      let newBoxState = pushBox(context, movement, boxHit);
+      if(boxHit && newBoxState.isBoxMoved){
+          player.x = newX;
+          player.y = newY;
+          moveBox(context, boxHit, newBoxState.newX, newBoxState.newY)
+      }
+    }else{
+        player.x = newX;
+        player.y = newY;
+    }
+  }
+  
   player.x = Math.max(0, Math.min(player.x, context.canvas.width - player.size))
   player.y = Math.max(0, Math.min(player.y, context.canvas.height - player.size))
 
@@ -147,6 +136,111 @@ function movePlayer(context){
   }
   return playerMoved
 
+
+    
+}
+
+function moveBox(context, box, newX, newY){
+  box.x = newX;
+  box.y = newY;
+  box.x = Math.max(0, Math.min(box.x, context.canvas.width - box.size))
+  box.y = Math.max(0, Math.min(box.y, context.canvas.height - box.size))
+
+
+  box.update()
+}
+
+function pushBox(context, movement, box){
+  let newX = box.x;
+  let newY = box.y;
+  let boxMoved = false;
+  
+  switch (movement){
+      case "left":
+          newX -= player.speedX
+          break;
+      case "right":
+          newX += player.speedX
+          break;
+      case "up":
+          newY -= player.speedY
+          break;
+      case "down":
+          newY += player.speedY
+          break;
+      default:
+          return;
+  }
+
+  // check if pushing the box moves it outside the border
+  if(newX<0 || newY<0 || newX>=context.canvas.width || newY>=context.canvas.height){
+      newX = Math.max(0, Math.min(newX, context.canvas.width - box.size))
+      newY = Math.max(0, Math.min(newY, context.canvas.height - box.size))
+  }else if (!isHittingWall(newX, newY) && !isHittingOtherBox(box, newX, newY)) {
+      boxMoved = true;
+  }
+  return {
+      isBoxMoved : boxMoved,
+      newX: newX,
+      newY: newY
+  }
+
+}
+
+
+function isHittingWall(newX, newY){
+  for(let wallBlock of wallBlocks){
+      if (newY == wallBlock.y && newX == wallBlock.x){
+          return true;
+      }
+  }
+  return false;
+}
+
+function isHittingBox(newX, newY){
+  for(let box of moveableBoxes){
+      if (newX == box.x && newY == box.y){
+          return box;
+      }
+  }
+  return false;
+}
+
+function isHittingOtherBox(box, newX, newY){
+  for(let otherbox of moveableBoxes){
+      if(box.id == otherbox.id){
+          continue
+      }else if (newX == otherbox.x && newY == otherbox.y){
+          return true;
+      }
+  }
+  return false;
+}
+
+function drawWalls() {
+  for (let wallBlock of wallBlocks) {
+      wallBlock.drawWallBlock();
+  }
+  player.update();
+}
+
+
+function NavBar() {
+  return (
+    <div>Nav</div>
+  )
+}
+
+function NavLeft() {
+  return (
+    <div>NavL</div>
+  )
+}
+
+function NavRight() {
+  return (
+    <div>NavR</div>
+  )
 }
 
 function MainArea() {
