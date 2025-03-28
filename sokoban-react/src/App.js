@@ -33,15 +33,15 @@ function GameArea({incrementMove}) {
 
     window.addEventListener("keydown", function(event){
       if(!hasPlayerWon){
-          updateGameArea(context, incrementMove)
+          setHasPlayerWon(updateGameArea(context, incrementMove))
           context.key = event.key;
       }
     });
     window.addEventListener("keyup", function(){
-        if(!hasPlayerWon){
-            updateGameArea(context, incrementMove)
-            context.key = false;
-        }
+      if(!hasPlayerWon){
+          setHasPlayerWon(updateGameArea(context, incrementMove))
+          context.key = false;
+      }
     })
     startGame();
     gameInitialized.current = true;
@@ -86,9 +86,31 @@ function updateGameArea(context, incrementMove) {
       incrementMove()
   }
   drawWalls();
-  // checkWin();
+  checkWin();
   // disableCurrentLevelButton();
 } 
+
+function checkWin(){
+  let score = 0;
+  // hasPlayerWon = false;
+  for(let target of targets){
+      for (let box of moveableBoxes){
+          if (box.x == target.x && box.y == target.y){
+              score = score + 1
+              box.markBox();
+              continue;
+          }
+      }
+  }
+  
+  if (score == targets.length){
+      return true;
+      // showWinScreen();
+      // console.log("player won")
+  }
+  return false
+
+}
 
 function clearCanvas(context) {
   context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clear the entire canvas
