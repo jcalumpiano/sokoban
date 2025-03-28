@@ -1,6 +1,6 @@
 import './App.css';
 import React, { useState, useRef, useEffect } from "react";
-import {Button, Wall, Player} from './assets'
+import {Button, Wall, Player, MoveableBox, Target} from './assets'
 import { levels, levelsIndexMap, getNextLevelIndex, getLevelByIndex, wallSymbol, boxSymbol, playerSymbol, targetSymbol} from './levels';
 
 
@@ -12,7 +12,7 @@ let player;
 
 const gridSize = 30;
 
-function GameArea() {
+function GameArea({incrementMove}) {
   const canvasRef = useRef(null);
   const gameInitialized = useRef(false);
   let [hasPlayerWon, setHasPlayerWon] = useState(false);
@@ -28,19 +28,18 @@ function GameArea() {
       canvas.width = levels[0].canvasWidth * gridSize;
       canvas.height = levels[0].canvasHeight * gridSize;
       loadWallsFromTemplate(levels[0].template, context);
-      updateGameArea(context);
+      updateGameArea(context, incrementMove);
     }
 
     window.addEventListener("keydown", function(event){
       if(!hasPlayerWon){
-          updateGameArea(context)
+          updateGameArea(context, incrementMove)
           context.key = event.key;
-
       }
     });
     window.addEventListener("keyup", function(){
         if(!hasPlayerWon){
-            updateGameArea(context)
+            updateGameArea(context, incrementMove)
             context.key = false;
         }
     })
@@ -69,18 +68,22 @@ function loadWallsFromTemplate(template, context) {
             wallBlocks.push( new Wall(context, colIndex*gridSize, rowIndex*gridSize, "red", gridSize));
         }else if(cell.trim() === playerSymbol){
             player = new Player(context, colIndex*gridSize, rowIndex*gridSize, "blue", gridSize);
+        }else if(cell.trim() === boxSymbol){
+            moveableBoxes.push(new MoveableBox(context, colIndex*gridSize, rowIndex*gridSize, "green", gridSize, "white"))
+        }else if(cell.trim() === targetSymbol){
+            targets.push(new Target(context, colIndex*gridSize, rowIndex*gridSize, "yellow", gridSize))
         }
     });
   });
 
 }
 
-function updateGameArea(context) {
+function updateGameArea(context, incrementMove) {
   clearCanvas(context);
   let playerMoved = movePlayer(context);
   if (playerMoved){
     console.log("player moved")
-      // moveCounter.incrementMove()
+      incrementMove()
   }
   drawWalls();
   // checkWin();
@@ -221,9 +224,26 @@ function drawWalls() {
   for (let wallBlock of wallBlocks) {
       wallBlock.drawWallBlock();
   }
+  
+  for (let target of targets) {
+      target.drawTarget();
+  }
+
+  for (let box of moveableBoxes) {
+      box.update();
+  }
   player.update();
 }
 
+function MoveCounter({moveCount}) {
+
+  return (
+    <div>
+      <div>Moves</div>
+      <div>{moveCount}</div>
+    </div>
+  )
+}
 
 function NavBar() {
   return (
@@ -237,18 +257,22 @@ function NavLeft() {
   )
 }
 
-function NavRight() {
+function NavRight({moveCount}) {
   return (
-    <div>NavR</div>
+    <MoveCounter moveCount={moveCount}/>
   )
 }
 
 function MainArea() {
+  // State for move count
+  const [moveCount, setMoveCount] = useState(0);
+  const incrementMove = () => setMoveCount(prev => prev + 1);
+
   return (
     <div class="flexRow mainArea">
       <NavLeft />
-      <GameArea />
-      <NavRight />
+      <GameArea incrementMove={incrementMove}/>
+      <NavRight moveCount={moveCount}/>
     </div>
   )
 }
