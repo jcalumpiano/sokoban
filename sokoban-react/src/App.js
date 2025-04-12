@@ -1,8 +1,8 @@
 import './App.css';
 import React, { useState, useRef, useEffect } from "react";
-import {Button, Wall, Player, MoveableBox, Target} from './assets'
+import { Wall, Player, MoveableBox, Target} from './assets'
 import { levels, levelsIndexMap, getNextLevelIndex, getLevelByIndex, wallSymbol, boxSymbol, playerSymbol, targetSymbol} from './levels';
-
+import {Popup} from "./components"
 
 
 let wallBlocks = [];
@@ -15,43 +15,106 @@ const gridSize = 30;
 function GameArea({incrementMove}) {
   const canvasRef = useRef(null);
   const gameInitialized = useRef(false);
-  let [hasPlayerWon, setHasPlayerWon] = useState(false);
+  let hasPlayerWon = useRef(false);
+  // let [hasPlayerWon, setHasPlayerWon] = useState(false);
+  const [showPopup, setShowPopup] = useState(false)
   
   useEffect(() => {
+    // return anything if the game is already initialized to prevent re-render
     if (gameInitialized.current) return;
+    
     const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
+    const context = canvasRef.current.getContext('2d');
     // let gridSize = 20;
 
     function startGame(){
-      setHasPlayerWon(false);
       canvas.width = levels[0].canvasWidth * gridSize;
       canvas.height = levels[0].canvasHeight * gridSize;
       loadWallsFromTemplate(levels[0].template, context);
-      updateGameArea(context, incrementMove);
+      updateGameArea(context);
+    }
+
+    function updateGameArea(context){
+      clearCanvas();
+      let playerMoved = movePlayer(context);
+      if (playerMoved){         
+          for(let target of targets){
+            for (let box of moveableBoxes){
+                if (box.x == target.x && box.y == target.y){
+                    box.markBox();
+                    continue;
+                }
+            }
+          }
+      }
+      
+      drawWalls();
+      return playerMoved;
+      // disableCurrentLevelButton();
+    }
+
+    function clearCanvas() {
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clear the entire canvas
     }
 
     window.addEventListener("keydown", function(event){
-      if(!hasPlayerWon){
-          setHasPlayerWon(updateGameArea(context, incrementMove))
+      if(!hasPlayerWon.current){
           context.key = event.key;
       }
     });
+
     window.addEventListener("keyup", function(){
-      if(!hasPlayerWon){
-          setHasPlayerWon(updateGameArea(context, incrementMove))
+
+      if(!hasPlayerWon.current){
+
+        const playerMoved = updateGameArea(context);
+        if (playerMoved){
+          incrementMove()
+        }
+
+        const winCondition = checkWin();
+        if (winCondition) {
+          hasPlayerWon.current = winCondition;
+          setShowPopup(true) // Trigger the popup when player wins
+        }
           context.key = false;
       }
     })
+
     startGame();
     gameInitialized.current = true;
 
     drawWalls();
 
   }, [])
+
+  const hideWinScreen = () => {
+    setShowPopup(false);
+  }
+
+
   return (
-    <canvas ref={canvasRef}>GA</canvas>
-  )
+    <div>
+      <canvas ref={canvasRef}>GA</canvas>
+
+      {/* Conditionally render the popup when the player wins */}
+      {hasPlayerWon && showPopup &&(
+        <Popup
+          header="You Won!"
+          message="Congratulations, you have won the game!"
+          buttonLeftText="Play Again"
+          buttonRightText="Exit"
+          function1={playAgain}
+          function2={hideWinScreen}
+          onClose={hideWinScreen}
+        />
+      )}
+    </div>
+  );
+}
+
+const playAgain = () => {
+  console.log('play again')
 }
 
 function loadWallsFromTemplate(template, context) {
@@ -78,42 +141,46 @@ function loadWallsFromTemplate(template, context) {
 
 }
 
-function updateGameArea(context, incrementMove) {
-  clearCanvas(context);
-  let playerMoved = movePlayer(context);
-  if (playerMoved){
-    console.log("player moved")
-      incrementMove()
-  }
-  drawWalls();
-  checkWin();
-  // disableCurrentLevelButton();
-} 
+// function updateGameArea(context) {
+//   clearCanvas(context);
+//   let playerMoved = movePlayer(context);
+//   if (playerMoved){
+//     console.log("player moved")
+      
+//       for(let target of targets){
+//         for (let box of moveableBoxes){
+//             if (box.x == target.x && box.y == target.y){
+//                 box.markBox();
+//                 continue;
+//             }
+//         }
+//       }
+
+//   }
+  
+//   drawWalls();
+//   return playerMoved;
+//   // disableCurrentLevelButton();
+// } 
 
 function checkWin(){
   let score = 0;
-  // hasPlayerWon = false;
+  
   for(let target of targets){
       for (let box of moveableBoxes){
           if (box.x == target.x && box.y == target.y){
               score = score + 1
-              box.markBox();
               continue;
           }
       }
   }
-  
   if (score == targets.length){
-      return true;
-      // showWinScreen();
-      // console.log("player won")
+    console.log("player won");
+    return true;
   }
+
   return false
 
-}
-
-function clearCanvas(context) {
-  context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clear the entire canvas
 }
 
 function movePlayer(context){
@@ -285,25 +352,20 @@ function NavRight({moveCount}) {
   )
 }
 
-function MainArea() {
+function MainContainer() {
+  
   // State for move count
   const [moveCount, setMoveCount] = useState(0);
   const incrementMove = () => setMoveCount(prev => prev + 1);
 
   return (
-    <div class="flexRow mainArea">
-      <NavLeft />
-      <GameArea incrementMove={incrementMove}/>
-      <NavRight moveCount={moveCount}/>
-    </div>
-  )
-}
-
-function MainContainer() {
-  return (
     <div>
       <NavBar />
-      <MainArea />
+      <div class="flexRow mainArea">
+        <NavLeft />
+        <GameArea incrementMove={incrementMove}/>
+        <NavRight moveCount={moveCount}/>
+      </div>
     </div>
     
   )
@@ -313,6 +375,7 @@ function MainContainer() {
 
 
 function App() {
+  
   return (
     <div className="App">
       <MainContainer />
