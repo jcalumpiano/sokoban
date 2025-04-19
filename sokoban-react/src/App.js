@@ -2,7 +2,7 @@ import './App.css';
 import React, { useState, useRef, useEffect } from "react";
 import { Wall, Player, MoveableBox, Target} from './assets'
 import { levels, levelsIndexMap, getNextLevelIndex, getLevelByIndex, wallSymbol, boxSymbol, playerSymbol, targetSymbol} from './levels';
-import {Popup} from "./components"
+import {Button, Popup} from "./components"
 
 
 let wallBlocks = [];
@@ -12,7 +12,7 @@ let player;
 
 const gridSize = 30;
 
-function GameArea({incrementMove}) {
+function GameArea({incrementMove, gameRef, setMoveCount}) {
   const canvasRef = useRef(null);
   const gameInitialized = useRef(false);
   let hasPlayerWon = useRef(false);
@@ -32,6 +32,17 @@ function GameArea({incrementMove}) {
       canvas.height = levels[0].canvasHeight * gridSize;
       loadWallsFromTemplate(levels[0].template, context);
       updateGameArea(context);
+    }
+
+    function restartGame() {
+      hasPlayerWon.current = false;
+      setShowPopup(false);
+      gameInitialized.current = false;
+      startGame();
+    }
+
+    if (gameRef) {
+      gameRef.current = { restartGame };
     }
 
     function updateGameArea(context){
@@ -89,6 +100,7 @@ function GameArea({incrementMove}) {
   }, [])
 
   const hideWinScreen = () => {
+    console.log(hasPlayerWon)
     setShowPopup(false);
   }
 
@@ -104,7 +116,7 @@ function GameArea({incrementMove}) {
           message="Congratulations, you have won the game!"
           buttonLeftText="Play Again"
           buttonRightText="Exit"
-          function1={playAgain}
+          function1={gameRef.current.restartGame}
           function2={hideWinScreen}
           onClose={hideWinScreen}
         />
@@ -346,25 +358,72 @@ function NavLeft() {
   )
 }
 
-function NavRight({moveCount}) {
+function NavRight({moveCount, level, gameRef, setMoveCount}) {
+
+  const [showRestartPopup, setShowRestartPopup] = useState(false);
+
+  const handleRestartClick = () => {
+    setShowRestartPopup(true);
+  };
+
+  const confirmRestart = () => {
+    if (gameRef.current && gameRef.current.restartGame) {
+      setMoveCount(0);
+      gameRef.current.restartGame(); // Call GameArea's restart function
+      setShowRestartPopup(false);
+    }
+  }
+
+  const cancelRestart = () => {
+    setShowRestartPopup(false);
+  }
+
   return (
-    <MoveCounter moveCount={moveCount}/>
+    <div>
+      <MoveCounter moveCount={moveCount}/>
+      <Button text={"Restart"} id={"restart"} onclick={handleRestartClick} />
+
+      {showRestartPopup && (
+        <Popup
+          header="Restart Level?"
+          message="Are you sure you want to restart? Your progress will be lost."
+          buttonLeftText="Yes"
+          buttonRightText="No"
+          function1={confirmRestart}
+          function2={cancelRestart}
+          onClose={cancelRestart}
+        />
+      )}
+
+    </div>
   )
 }
 
 function MainContainer() {
   
   // State for move count
+  const gameRef = useRef(null);
   const [moveCount, setMoveCount] = useState(0);
   const incrementMove = () => setMoveCount(prev => prev + 1);
+  const level = 0;
 
   return (
     <div>
       <NavBar />
       <div class="flexRow mainArea">
         <NavLeft />
-        <GameArea incrementMove={incrementMove}/>
-        <NavRight moveCount={moveCount}/>
+        <GameArea incrementMove={incrementMove} level = {level} gameRef={gameRef} setMoveCount={setMoveCount}/>
+        {/* <div> */}
+          {/* <MoveCounter moveCount={moveCount}/> */}
+          {/* <button onClick = {restartLevel}>Restart</button> */}
+          {/* <Button text="Restart" id="restart" onclick={restartLevel} /> */}
+        {/* </div> */}
+        <NavRight
+          moveCount={moveCount}
+          level={level}
+          gameRef={gameRef}
+          setMoveCount={setMoveCount}
+        />
       </div>
     </div>
     

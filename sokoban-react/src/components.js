@@ -25,7 +25,7 @@ export function Popup({header, message, buttonLeftText, buttonRightText, functio
                 <div className="divPopupButtonContainer">
                     <Button text={buttonLeftText} id={buttonLeftText} onclick={function1} />
                 
-                    <Button text={buttonRightText} id={buttonRightText} onClick={function2} />
+                    <Button text={buttonRightText} id={buttonRightText} onclick={function2} />
                 </div>
             </div>
         </div>
