@@ -2,7 +2,7 @@ import './App.css';
 import React, { useState, useRef, useEffect } from "react";
 import { Wall, Player, MoveableBox, Target} from './assets'
 import { levels, levelsIndexMap, getNextLevelIndex, getLevelByIndex, wallSymbol, boxSymbol, playerSymbol, targetSymbol} from './levels';
-import {Button, Popup} from "./components"
+import {Button, Popup, LevelSelector} from "./components"
 
 
 let wallBlocks = [];
@@ -12,7 +12,7 @@ let player;
 
 const gridSize = 30;
 
-function GameArea({incrementMove, gameRef, setMoveCount}) {
+function GameArea({incrementMove, gameRef, level}) {
   const canvasRef = useRef(null);
   const gameInitialized = useRef(false);
   let hasPlayerWon = useRef(false);
@@ -27,11 +27,12 @@ function GameArea({incrementMove, gameRef, setMoveCount}) {
     const context = canvasRef.current.getContext('2d');
     // let gridSize = 20;
 
-    function startGame(){
-      canvas.width = levels[0].canvasWidth * gridSize;
-      canvas.height = levels[0].canvasHeight * gridSize;
-      loadWallsFromTemplate(levels[0].template, context);
+    function startGame(level){
+      canvas.width = level.canvasWidth * gridSize;
+      canvas.height = level.canvasHeight * gridSize;
+      loadWallsFromTemplate(level.template, context);
       updateGameArea(context);
+      console.log(level.levelName)
     }
 
     function restartGame() {
@@ -42,7 +43,10 @@ function GameArea({incrementMove, gameRef, setMoveCount}) {
     }
 
     if (gameRef) {
-      gameRef.current = { restartGame };
+      // assign methods to the reference object
+      // use updated level
+      gameRef.current = { restartGame, startGame: () => startGame(gameRef.current.level) };
+
     }
 
     function updateGameArea(context){
@@ -92,7 +96,7 @@ function GameArea({incrementMove, gameRef, setMoveCount}) {
       }
     })
 
-    startGame();
+    startGame(level);
     gameInitialized.current = true;
 
     drawWalls();
@@ -352,13 +356,21 @@ function NavBar() {
   )
 }
 
-function NavLeft() {
+function NavLeft({gameRef, setSelectedLevel}) {
+
+  const handleSelectLevel = (newLevel) => {
+    setSelectedLevel(newLevel)
+    gameRef.current.level = newLevel
+    console.log(newLevel.levelName)
+    gameRef.current.startGame(newLevel)
+  }
+
   return (
-    <div>NavL</div>
+    <LevelSelector options={levels} selectLevel={handleSelectLevel}/>
   )
 }
 
-function NavRight({moveCount, level, gameRef, setMoveCount}) {
+function NavRight({moveCount, gameRef, setMoveCount}) {
 
   const [showRestartPopup, setShowRestartPopup] = useState(false);
 
@@ -405,14 +417,17 @@ function MainContainer() {
   const gameRef = useRef(null);
   const [moveCount, setMoveCount] = useState(0);
   const incrementMove = () => setMoveCount(prev => prev + 1);
-  const level = 0;
+  const [selectedLevel, setSelectedLevel] = useState(levels[0])
 
   return (
     <div>
       <NavBar />
       <div class="flexRow mainArea">
-        <NavLeft />
-        <GameArea incrementMove={incrementMove} level = {level} gameRef={gameRef} setMoveCount={setMoveCount}/>
+        <NavLeft 
+          gameRef={gameRef}
+          setSelectedLevel={setSelectedLevel}
+        />
+        <GameArea incrementMove={incrementMove} gameRef={gameRef} level={selectedLevel}/>
         {/* <div> */}
           {/* <MoveCounter moveCount={moveCount}/> */}
           {/* <button onClick = {restartLevel}>Restart</button> */}
@@ -420,7 +435,6 @@ function MainContainer() {
         {/* </div> */}
         <NavRight
           moveCount={moveCount}
-          level={level}
           gameRef={gameRef}
           setMoveCount={setMoveCount}
         />

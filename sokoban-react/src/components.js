@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 export function Button({text, id, onclick}){
     return (
         <button 
@@ -28,6 +30,26 @@ export function Popup({header, message, buttonLeftText, buttonRightText, functio
                     <Button text={buttonRightText} id={buttonRightText} onclick={function2} />
                 </div>
             </div>
+        </div>
+    )
+}
+
+export function LevelSelector({options, selectLevel}){
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+
+    const toggleDropdown = () => {
+        setIsDropdownOpen((prev) => !prev);
+    }
+
+    return(
+        <div>
+            <Button text={"Select Level"} id={"levelSelect"} onclick={toggleDropdown}/>
+            {isDropdownOpen && 
+                options.map((option) => (
+                    <Button text={option.levelName} id={option.levelName} onclick={() => selectLevel(option)}/>
+                ))
+            }
         </div>
     )
 }
