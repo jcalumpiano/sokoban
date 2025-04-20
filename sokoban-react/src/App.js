@@ -12,7 +12,7 @@ let player;
 
 const gridSize = 30;
 
-function GameArea({incrementMove, gameRef, level}) {
+function GameArea({incrementMove, gameRef, level, setMoveCount}) {
   const canvasRef = useRef(null);
   const gameInitialized = useRef(false);
   let hasPlayerWon = useRef(false);
@@ -32,20 +32,20 @@ function GameArea({incrementMove, gameRef, level}) {
       canvas.height = level.canvasHeight * gridSize;
       loadWallsFromTemplate(level.template, context);
       updateGameArea(context);
-      console.log(level.levelName)
     }
 
     function restartGame() {
+      setMoveCount(0)
       hasPlayerWon.current = false;
       setShowPopup(false);
       gameInitialized.current = false;
-      startGame();
+      startGame(gameRef.current.level);
     }
 
     if (gameRef) {
       // assign methods to the reference object
       // use updated level
-      gameRef.current = { restartGame, startGame: () => startGame(gameRef.current.level) };
+      gameRef.current = { restartGame, startGame: () => startGame(gameRef.current.level), level};
 
     }
 
@@ -357,16 +357,49 @@ function NavBar() {
 }
 
 function NavLeft({gameRef, setSelectedLevel}) {
+  const [showChangeLevelPopup, setShowChangeLevelPopup] = useState(false);
+  const [pendingLevel, setPendingLevel] = useState(null);
+  // let oldLevel = gameRef.current.level
+  let newLevel;
 
-  const handleSelectLevel = (newLevel) => {
-    setSelectedLevel(newLevel)
-    gameRef.current.level = newLevel
-    console.log(newLevel.levelName)
-    gameRef.current.startGame(newLevel)
+  const handleSelectLevel = (selectedLevel) => {
+    setPendingLevel(selectedLevel);
+    if(selectedLevel!=gameRef.current.level){
+      setShowChangeLevelPopup(true);
+    }
+  }
+
+  const confirmChangeLevel = () => {
+    if (gameRef.current && gameRef.current.startGame && pendingLevel) {
+      //pass level here
+      setSelectedLevel(pendingLevel)
+      gameRef.current.level = pendingLevel
+      gameRef.current.startGame(pendingLevel)
+    }
+    setShowChangeLevelPopup(false);
+  }
+
+  const cancelChangeLevel = () => {
+    setShowChangeLevelPopup(false);
+    setPendingLevel(null)
   }
 
   return (
-    <LevelSelector options={levels} selectLevel={handleSelectLevel}/>
+    <div>
+      <LevelSelector options={levels} selectLevel={handleSelectLevel}/>
+      {showChangeLevelPopup && (
+        <Popup
+          header="Change Level?"
+          message="Are you sure you want to change levels? Your progress will be lost."
+          buttonLeftText="Yes"
+          buttonRightText="No"
+          function1={confirmChangeLevel}
+          function2={cancelChangeLevel}
+          onClose={cancelChangeLevel}
+        />
+      )}
+    </div>
+    
   )
 }
 
@@ -380,7 +413,6 @@ function NavRight({moveCount, gameRef, setMoveCount}) {
 
   const confirmRestart = () => {
     if (gameRef.current && gameRef.current.restartGame) {
-      setMoveCount(0);
       gameRef.current.restartGame(); // Call GameArea's restart function
       setShowRestartPopup(false);
     }
@@ -427,7 +459,7 @@ function MainContainer() {
           gameRef={gameRef}
           setSelectedLevel={setSelectedLevel}
         />
-        <GameArea incrementMove={incrementMove} gameRef={gameRef} level={selectedLevel}/>
+        <GameArea incrementMove={incrementMove} gameRef={gameRef} level={selectedLevel} setMoveCount={setMoveCount}/>
         {/* <div> */}
           {/* <MoveCounter moveCount={moveCount}/> */}
           {/* <button onClick = {restartLevel}>Restart</button> */}
