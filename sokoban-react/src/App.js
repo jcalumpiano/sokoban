@@ -343,7 +343,7 @@ function drawWalls() {
 function MoveCounter({moveCount}) {
 
   return (
-    <div>
+    <div className='divMoveCounter'>
       <div>Moves</div>
       <div>{moveCount}</div>
     </div>
@@ -352,7 +352,7 @@ function MoveCounter({moveCount}) {
 
 function NavBar() {
   return (
-    <div>Nav</div>
+    <div className='navBar'></div>
   )
 }
 
@@ -385,7 +385,7 @@ function NavLeft({gameRef, setSelectedLevel}) {
   }
 
   return (
-    <div>
+    <div className='navVertical navLeft'>
       <LevelSelector options={levels} selectLevel={handleSelectLevel}/>
       {showChangeLevelPopup && (
         <Popup
@@ -423,7 +423,7 @@ function NavRight({moveCount, gameRef, setMoveCount}) {
   }
 
   return (
-    <div>
+    <div className='navVertical navRight'>
       <MoveCounter moveCount={moveCount}/>
       <Button text={"Restart"} id={"restart"} onclick={handleRestartClick} />
 
@@ -452,7 +452,7 @@ function MainContainer() {
   const [selectedLevel, setSelectedLevel] = useState(levels[0])
 
   return (
-    <div>
+    <div className='mainContainer'>
       <NavBar />
       <div class="flexRow mainArea">
         <NavLeft 

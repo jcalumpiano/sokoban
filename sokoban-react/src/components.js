@@ -45,11 +45,13 @@ export function LevelSelector({options, selectLevel}){
     return(
         <div>
             <Button text={"Select Level"} id={"levelSelect"} onclick={toggleDropdown}/>
-            {isDropdownOpen && 
-                options.map((option) => (
-                    <Button text={option.levelName} id={option.levelName} onclick={() => selectLevel(option)}/>
-                ))
-            }
+            <div className="dropdownContent">
+                {isDropdownOpen && 
+                    options.map((option) => (
+                        <Button text={option.levelName} id={option.levelName} onclick={() => selectLevel(option)}/>
+                    ))
+                }
+            </div>
         </div>
     )
 }
