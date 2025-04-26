@@ -1,11 +1,13 @@
 import { useState } from "react"
 
-export function Button({text, id, onclick, className}){
+export function Button({text, id, onclick, className, isDisabled}){
     return (
         <button 
             id={id} 
             className={className}
             onClick={onclick}
+            disabled={isDisabled}
+
         >
             {text}
         </button>
@@ -34,9 +36,9 @@ export function Popup({header, message, buttonLeftText, buttonRightText, functio
     )
 }
 
-export function LevelSelector({options, selectLevel}){
+export function LevelSelector({options, selectLevel, currentLevel}){
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+    console.log(currentLevel.levelName)
 
     const toggleDropdown = () => {
         setIsDropdownOpen((prev) => !prev);
@@ -47,9 +49,14 @@ export function LevelSelector({options, selectLevel}){
             <Button text={"Select Level"} id={"levelSelect"} onclick={toggleDropdown}/>
             <div className="dropdownContent">
                 {isDropdownOpen && 
-                    options.map((option) => (
-                        <Button text={option.levelName} id={option.levelName} onclick={() => selectLevel(option)} className="marginTop"/>
-                    ))
+                    options.map((option) => 
+                        currentLevel.levelName===option.levelName ? (
+                            // if current level is selected, disable button
+                            <Button text={option.levelName} id={option.levelName} onclick={() => selectLevel(option)} className="marginTop" isDisabled={true}/>
+                        ) : (
+                            <Button text={option.levelName} id={option.levelName} onclick={() => selectLevel(option)} className="marginTop" isDisabled={false}/> 
+                        )
+                    )
                 }
             </div>
         </div>

@@ -393,10 +393,11 @@ function NavBar() {
   )
 }
 
-function NavLeft({gameRef, setSelectedLevel}) {
+function NavLeft({gameRef, setSelectedLevel, currentLevel}) {
   const [showChangeLevelPopup, setShowChangeLevelPopup] = useState(false);
   const [pendingLevel, setPendingLevel] = useState(null);
   // let oldLevel = gameRef.current.level
+  // console.log(currentLevel)
   let newLevel;
 
   const handleSelectLevel = (selectedLevel) => {
@@ -423,7 +424,7 @@ function NavLeft({gameRef, setSelectedLevel}) {
 
   return (
     <div className='navVertical navLeft'>
-      <LevelSelector options={levels} selectLevel={handleSelectLevel}/>
+      <LevelSelector options={levels} selectLevel={handleSelectLevel} currentLevel={currentLevel}/>
       {showChangeLevelPopup && (
         <Popup
           header="Change Level?"
@@ -495,6 +496,7 @@ function MainContainer() {
         <NavLeft 
           gameRef={gameRef}
           setSelectedLevel={setSelectedLevel}
+          currentLevel={selectedLevel}
         />
         <GameArea incrementMove={incrementMove} gameRef={gameRef} level={selectedLevel} setMoveCount={setMoveCount}/>
         {/* <div> */}
