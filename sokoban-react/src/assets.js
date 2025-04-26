@@ -21,12 +21,12 @@ export function Wall(context, x, y, color, size, image){
     this.color=color;
     this.size=size;
     this.ctx = context;
+    
+
     this.drawWallBlock = function (){
         let ctx = this.ctx
         if (image != null) {
-            this.image = new Image();
-            this.image.src = image;
-            ctx.drawImage(this.image, this.x, this.y, this.size, this.size);
+            ctx.drawImage(image, this.x, this.y, this.size, this.size);
         }else{
             ctx.fillStyle = color;
             ctx.fillRect(this.x, this.y, this.size, this.size);
@@ -39,18 +39,19 @@ export function Player(context, x, y, color, size, image){
     this.y=y;
     this.speedX = size;
     this.speedY = size;   
-    this.color=color;
+    this.color = null ? "lightgray" : color;
     if (image != null) {
         this.image = new Image();
         this.image.src = image;
     }
     this.size=size;
     this.ctx = context
+    
 
     this.update = function(){
         let ctx = this.ctx
         if (image != null) {
-            ctx.drawImage(this.image, this.x, this.y, this.size, this.size);
+            ctx.drawImage(image, this.x, this.y, this.size, this.size);
         }else{
             ctx.fillStyle = color;
             ctx.fillRect(this.x, this.y, this.size, this.size);    
@@ -77,7 +78,7 @@ export function MoveableBox(context, x, y, color, size, markedColor, image, mark
     }
     this.update = function(){
         if (image != null) {
-            this.ctx.drawImage(this.image, this.x, this.y, this.size, this.size);
+            this.ctx.drawImage(image, this.x, this.y, this.size, this.size);
         }else{
             this.ctx.fillStyle = color;
             this.ctx.fillRect(this.x, this.y, this.size, this.size);    
@@ -85,7 +86,7 @@ export function MoveableBox(context, x, y, color, size, markedColor, image, mark
     };
     this.markBox = function(){
         if (markedImage != null) {
-            this.ctx.drawImage(this.markedImage, this.x, this.y, this.size, this.size);
+            this.ctx.drawImage(markedImage, this.x, this.y, this.size, this.size);
         }else{
             this.ctx.fillStyle = markedColor;
             this.ctx.fillRect(this.x, this.y, this.size, this.size);    
@@ -103,7 +104,7 @@ export function Target(context, x, y, color, size, image){
         if (image != null) {
             this.image = new Image();
             this.image.src = image;
-            this.ctx.drawImage(this.image, this.x, this.y, this.size, this.size);
+            this.ctx.drawImage(image, this.x, this.y, this.size, this.size);
         }else{
             this.ctx.fillStyle = color;
             this.ctx.fillRect(this.x, this.y, this.size, this.size);

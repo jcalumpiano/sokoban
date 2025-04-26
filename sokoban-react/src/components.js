@@ -1,10 +1,10 @@
 import { useState } from "react"
 
-export function Button({text, id, onclick}){
+export function Button({text, id, onclick, className}){
     return (
         <button 
             id={id} 
-            className={id}
+            className={className}
             onClick={onclick}
         >
             {text}
@@ -48,7 +48,7 @@ export function LevelSelector({options, selectLevel}){
             <div className="dropdownContent">
                 {isDropdownOpen && 
                     options.map((option) => (
-                        <Button text={option.levelName} id={option.levelName} onclick={() => selectLevel(option)}/>
+                        <Button text={option.levelName} id={option.levelName} onclick={() => selectLevel(option)} className="marginTop"/>
                     ))
                 }
             </div>

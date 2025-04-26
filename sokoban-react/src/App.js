@@ -15,8 +15,8 @@ const gridSize = 30;
 function GameArea({incrementMove, gameRef, level, setMoveCount}) {
   const canvasRef = useRef(null);
   const gameInitialized = useRef(false);
-  let hasPlayerWon = useRef(false);
-  // let [hasPlayerWon, setHasPlayerWon] = useState(false);
+  // let hasPlayerWon = useRef(false);
+  let [hasPlayerWon, setHasPlayerWon] = useState(false);
   const [showPopup, setShowPopup] = useState(false)
   
   useEffect(() => {
@@ -30,13 +30,14 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
     function startGame(level){
       canvas.width = level.canvasWidth * gridSize;
       canvas.height = level.canvasHeight * gridSize;
-      loadWallsFromTemplate(level.template, context);
-      updateGameArea(context);
+      loadWallsFromTemplate(level.template, context).then(() => {
+        setHasPlayerWon(false)
+        updateGameArea(context);
+      });
     }
 
     function restartGame() {
       setMoveCount(0)
-      hasPlayerWon.current = false;
       setShowPopup(false);
       gameInitialized.current = false;
       startGame(gameRef.current.level);
@@ -89,7 +90,7 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
 
         const winCondition = checkWin();
         if (winCondition) {
-          hasPlayerWon.current = winCondition;
+          setHasPlayerWon(winCondition);
           setShowPopup(true) // Trigger the popup when player wins
         }
           context.key = false;
@@ -107,10 +108,11 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
     console.log(hasPlayerWon)
     setShowPopup(false);
   }
-
+  const wallImg = new Image();
+  wallImg.src = "public/img/wall.png"
 
   return (
-    <div>
+    <div className='gameArea'>
       <canvas ref={canvasRef}>GA</canvas>
 
       {/* Conditionally render the popup when the player wins */}
@@ -139,22 +141,57 @@ function loadWallsFromTemplate(template, context) {
   targets = [];
   const rows = template.split('\n')
 
-  rows.forEach((row, rowIndex) => {
-    const columns = row.split(','); // Split each row by commas
-    columns.forEach((cell, colIndex) => {
-        if (cell.trim() === wallSymbol) {
-            // Create a block at the rowIndex, colIndex position
-            wallBlocks.push( new Wall(context, colIndex*gridSize, rowIndex*gridSize, "red", gridSize));
-        }else if(cell.trim() === playerSymbol){
-            player = new Player(context, colIndex*gridSize, rowIndex*gridSize, "blue", gridSize);
-        }else if(cell.trim() === boxSymbol){
-            moveableBoxes.push(new MoveableBox(context, colIndex*gridSize, rowIndex*gridSize, "green", gridSize, "white"))
-        }else if(cell.trim() === targetSymbol){
-            targets.push(new Target(context, colIndex*gridSize, rowIndex*gridSize, "yellow", gridSize))
-        }
-    });
-  });
+  player = new Player(context, 0, 0, null, gridSize)
+  
+  return preloadImages().then((images) => {
 
+    rows.forEach((row, rowIndex) => {
+      const columns = row.split(',');
+      columns.forEach((cell, colIndex) => {
+        const x = colIndex * gridSize;
+        const y = rowIndex * gridSize;
+        const trimmed = cell.trim();
+  
+        if (trimmed === wallSymbol) {
+          wallBlocks.push(new Wall(context, colIndex*gridSize, rowIndex*gridSize, "red", gridSize, images.wall));
+        } else if (trimmed === playerSymbol) {
+          player = new Player(context, colIndex*gridSize, rowIndex*gridSize, "blue", gridSize, images.player);
+        } else if (trimmed === boxSymbol) {
+          moveableBoxes.push(new MoveableBox(context, colIndex*gridSize, rowIndex*gridSize, "green", gridSize, "white", images.box, images.box))
+        } else if (trimmed === targetSymbol) {
+          targets.push(new Target(context, colIndex*gridSize, rowIndex*gridSize, "yellow", gridSize, images.target))
+
+        }
+      });
+    });
+    
+  });
+}
+
+function preloadImages(){
+  const imagePaths = {
+    wall: '/img/wall.png',
+    box: '/img/block.png',
+    player: '/img/char.png',
+    target: '/img/mark.png',
+  };
+
+  const loadedImages = {};
+
+  const promises = Object.entries(imagePaths).map(([key, src]) => {
+    return new Promise ((resolve, reject) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        loadedImages[key] = img;
+        resolve();
+      }
+      img.onerror = reject;
+
+    })
+  })
+
+  return Promise.all(promises).then(() => loadedImages)
 }
 
 // function updateGameArea(context) {
@@ -425,7 +462,7 @@ function NavRight({moveCount, gameRef, setMoveCount}) {
   return (
     <div className='navVertical navRight'>
       <MoveCounter moveCount={moveCount}/>
-      <Button text={"Restart"} id={"restart"} onclick={handleRestartClick} />
+      <Button text={"Restart"} id={"restart"} onclick={handleRestartClick} className="marginTop"/>
 
       {showRestartPopup && (
         <Popup

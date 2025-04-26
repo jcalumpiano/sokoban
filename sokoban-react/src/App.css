@@ -92,6 +92,10 @@ button :disabled{
   
 }
 
+.gameArea{
+  height: 100%;
+}
+
 .navVertical {
   flex-grow: 1;
   height:100%;
@@ -115,6 +119,7 @@ button :disabled{
 }
 
 .dropdownContent {
+  display: flex;
   flex-direction: column;
   padding: 10px 0px 10px 0px;
   position: relative;
