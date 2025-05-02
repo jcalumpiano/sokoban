@@ -62,7 +62,8 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
                 }
             }
           }
-      }
+      } 
+      
       
       drawWalls();
       return playerMoved;
