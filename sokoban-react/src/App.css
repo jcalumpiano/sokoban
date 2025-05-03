@@ -1,0 +1,250 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+@font-face {
+  font-family: pixelatedFont;
+  src: url(../public/fonts/slkscr.ttf);
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.flexRow{
+  display: flex;
+  flex-direction: row;
+}
+
+.mainArea{
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+canvas {
+  border: 2px solid black;
+  background-color: lightgray;
+  /* display: flex; */
+  /* margin: 0 auto; */
+}
+
+button{   
+  padding: 5px;
+  cursor: pointer;
+  border-width: 3px 3px 3px 3px;
+  border-color: #98989b;
+  border-style: solid;
+  font-family: pixelatedFont;
+  box-shadow: 0px 8px #6a6a6a;
+}
+
+/* button:hover {
+  border-width: 6px 4px 10px 4px;
+} */
+
+button :disabled{
+  color:white;
+}
+
+.mainContainer {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.navBar {
+  height: 50px;
+  width: 100%; 
+}
+
+.mainArea {
+  width: 100% ;
+  /* flex: 1; */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  
+}
+
+.gameArea{
+  height: 100%;
+}
+
+.navVertical {
+  flex-grow: 1;
+  height:100%;
+  padding: 0px 10px 0px 10px;
+}
+
+.navLeft{
+  width: 100px;
+}
+
+.navRight {
+  width: 100px;
+}
+
+.divMoveCounter {
+  display: flex;
+  justify-content: center;
+  padding: 0px 0px 0px 0px;
+  flex-direction: column;
+  font-family: pixelatedFont;
+}
+
+.dropdownContent {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0px 10px 0px;
+  position: relative;
+}
+
+.divPopup {
+	color: black;
+	z-index: 4;
+	background: #fdffb6;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	height: 200px;
+	width: 400px;
+	margin: -240px -200px;
+	display: flex;
+	flex-direction: column;
+	padding: 20px;
+	box-sizing: border-box;
+	align-items: center;
+	border-width: 3px 3px 3px 3px;
+	border-color: #a89f88;
+	border-style: solid;
+	font-family: pixelatedFont;
+	box-shadow: 0px 8px #4f4b37;
+}
+
+.divPopupButtonContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 80%;
+    margin: 0px 20px 0px 20px;
+}
+
+.popupButton {
+    min-width: 70px;
+}
+
+.buttonClose {
+	padding: 8px px;
+	vertical-align: middle;
+	overflow: hidden;
+	text-decoration: none;
+	text-align: center;
+	cursor: pointer;
+	height: 30px;
+	width: 30px;
+	margin: 5px;
+}
+
+.divPopupMessage {
+  flex-grow: 6;
+  color: #3c3c3c;
+}
+
+.popupHeaderDiv{
+  flex-grow: 2;
+  font-size: large;
+}
+
+.marginTop{
+  margin-top: 15px;
+}
+  
+.topRight {
+    position: absolute;
+    right: 0;
+    top: 0
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media only screen and (max-width: 720px) {
+  .mainArea {
+    flex-direction: column;
+  }
+
+  .navRight{
+      width:500px;
+      justify-content: space-between;
+      margin-bottom: 25px;
+  }
+
+  .navLeft{
+      margin-bottom: 20px;
+      width: 80%;
+      justify-content: center;
+  }
+
+  .dropdownContent{
+      position: absolute;
+  }
+
+  .navVertical{
+      display: flex;
+      flex-direction: row;
+      /* justify-content: space-between; */
+  }
+  
+}
+
+@media only screen and (max-width: 520px) {
+  .mainArea {
+    flex-direction: column;
+  }
+
+  canvas{
+      width: 90%;
+  }
+
+  .navRight{
+      width:90%;
+  }
+
+  .divPopup{
+      width: 350px;
+      margin: -160px -175px;
+  }
+
+}
