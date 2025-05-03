@@ -207,10 +207,14 @@ button :disabled{
 
   .navRight{
       width:500px;
+      justify-content: space-between;
+      margin-bottom: 25px;
   }
 
   .navLeft{
       margin-bottom: 20px;
+      width: 80%;
+      justify-content: center;
   }
 
   .dropdownContent{
@@ -220,8 +224,9 @@ button :disabled{
   .navVertical{
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
+      /* justify-content: space-between; */
   }
+  
 }
 
 @media only screen and (max-width: 520px) {
