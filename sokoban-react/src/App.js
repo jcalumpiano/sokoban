@@ -75,6 +75,7 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
     }
 
     window.addEventListener("keydown", function(event){
+      console.log(hasPlayerWon.current)
       if(!hasPlayerWon.current){
           context.key = event.key;
       }
@@ -82,8 +83,8 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
 
     window.addEventListener("keyup", function(){
 
+      console.log(hasPlayerWon.current)
       if(!hasPlayerWon.current){
-
         const playerMoved = updateGameArea(context);
         if (playerMoved){
           incrementMove()
@@ -106,7 +107,6 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
   }, [])
 
   const hideWinScreen = () => {
-    console.log(hasPlayerWon)
     setShowPopup(false);
   }
   const wallImg = new Image();

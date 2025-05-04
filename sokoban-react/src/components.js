@@ -1,4 +1,6 @@
-import { useState } from "react"
+import { useState } from "react";
+import ReactDOM from 'react-dom';
+
 
 export function Button({text, id, onclick, className, isDisabled}){
     return (
@@ -15,7 +17,8 @@ export function Button({text, id, onclick, className, isDisabled}){
 }
 
 export function Popup({header, message, buttonLeftText, buttonRightText, function1, function2, onClose}){
-    return(
+    // Rendered as a react portal to avoid alignment issues with parent container
+    return ReactDOM.createPortal(
         <div className="overlay" id="popupContainer">
             <div className="divPopup" id="popupBox">
                 <button className="buttonClose topRight" onClick={onClose}>
@@ -32,14 +35,13 @@ export function Popup({header, message, buttonLeftText, buttonRightText, functio
                     <Button text={buttonRightText} id={buttonRightText} onclick={function2} />
                 </div>
             </div>
-        </div>
+        </div>,
+    document.body 
     )
 }
 
 export function LevelSelector({options, selectLevel, currentLevel}){
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    console.log(currentLevel.levelName)
-
     const toggleDropdown = () => {
         setIsDropdownOpen((prev) => !prev);
     }
