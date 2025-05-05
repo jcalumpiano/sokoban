@@ -12,7 +12,7 @@ let player;
 
 const gridSize = 30;
 
-function GameArea({incrementMove, gameRef, level, setMoveCount}) {
+function GameArea({incrementMove, gameRef, level, setMoveCount, setSelectedLevel}) {
   const canvasRef = useRef(null);
   const gameInitialized = useRef(false);
   // let hasPlayerWon = useRef(false);
@@ -25,6 +25,7 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
     hasPlayerWonRef.current = hasPlayerWon;
 
   }, [hasPlayerWon])
+
   useEffect(() => {
     // return anything if the game is already initialized to prevent re-render
     if (gameInitialized.current) return;
@@ -33,8 +34,8 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
     // let gridSize = 20;
 
     function startGame(level){
-      canvas.width = level.canvasWidth * gridSize;
-      canvas.height = level.canvasHeight * gridSize;
+      canvas.width = gameRef.current.level.canvasWidth * gridSize;
+      canvas.height = gameRef.current.level.canvasHeight * gridSize;
       loadWallsFromTemplate(level.template, context).then(() => {
         setHasPlayerWon(false)
         updateGameArea(context);
@@ -48,10 +49,22 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
       startGame(gameRef.current.level);
     }
 
+    function startNextLevel() {
+      const nextLevelIndex = getNextLevelIndex(gameRef.current.level.levelName);
+      // const isLastLevel = nextLevelIndex >= levels.length;
+      let newLevel = getLevelByIndex(nextLevelIndex)
+      setMoveCount(0)
+      setShowPopup(false);
+      gameInitialized.current = false;
+      setSelectedLevel(newLevel)
+      gameRef.current.level = newLevel
+      startGame(newLevel);
+    }
+
     if (gameRef) {
       // assign methods to the reference object
       // use updated level
-      gameRef.current = { restartGame, startGame: () => startGame(gameRef.current.level), level};
+      gameRef.current = { restartGame, startGame: () => startGame(gameRef.current.level), level, startNextLevel};
 
     }
 
@@ -99,6 +112,7 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
           setHasPlayerWon(true);
           setShowPopup(true) // Trigger the popup when player wins
           context.key = false;
+          console.log(getNextLevelIndex(gameRef.current.level.levelName))
         }
       }
     })
@@ -113,8 +127,12 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
   const hideWinScreen = () => {
     setShowPopup(false);
   }
-  const wallImg = new Image();
-  wallImg.src = "public/img/wall.png"
+
+  // const goToNextLevel = () => {
+    
+    
+  //   {gameRef.current.startNextLevel}
+  // }
 
   return (
     <div className='gameArea'>
@@ -126,9 +144,17 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
           header="You Won!"
           message="Congratulations, you have won the game!"
           buttonLeftText="Play Again"
-          buttonRightText="Exit"
+          buttonRightText={
+            getNextLevelIndex(gameRef.current.level.levelName) >= levels.length
+              ? "Exit"
+              : "Next Level"
+          }
           function1={gameRef.current.restartGame}
-          function2={hideWinScreen}
+          function2={
+            getNextLevelIndex(gameRef.current.level.levelName) >= levels.length
+              ? hideWinScreen
+              : gameRef.current.startNextLevel
+          }
           onClose={hideWinScreen}
         />
       )}
@@ -503,7 +529,7 @@ function MainContainer() {
           setSelectedLevel={setSelectedLevel}
           currentLevel={selectedLevel}
         />
-        <GameArea incrementMove={incrementMove} gameRef={gameRef} level={selectedLevel} setMoveCount={setMoveCount}/>
+        <GameArea incrementMove={incrementMove} gameRef={gameRef} level={selectedLevel} setMoveCount={setMoveCount} setSelectedLevel={setSelectedLevel}/>
         {/* <div> */}
           {/* <MoveCounter moveCount={moveCount}/> */}
           {/* <button onClick = {restartLevel}>Restart</button> */}
