@@ -18,11 +18,16 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
   // let hasPlayerWon = useRef(false);
   let [hasPlayerWon, setHasPlayerWon] = useState(false);
   const [showPopup, setShowPopup] = useState(false)
-  
+
+  const hasPlayerWonRef = useRef(hasPlayerWon);
+  // update tracking of player status
+  useEffect(() => {
+    hasPlayerWonRef.current = hasPlayerWon;
+
+  }, [hasPlayerWon])
   useEffect(() => {
     // return anything if the game is already initialized to prevent re-render
     if (gameInitialized.current) return;
-    
     const canvas = canvasRef.current;
     const context = canvasRef.current.getContext('2d');
     // let gridSize = 20;
@@ -75,27 +80,26 @@ function GameArea({incrementMove, gameRef, level, setMoveCount}) {
     }
 
     window.addEventListener("keydown", function(event){
-      console.log(hasPlayerWon.current)
-      if(!hasPlayerWon.current){
+      if(!hasPlayerWonRef.current){
           context.key = event.key;
       }
     });
 
     window.addEventListener("keyup", function(){
 
-      console.log(hasPlayerWon.current)
-      if(!hasPlayerWon.current){
+      if(!hasPlayerWonRef.current){
         const playerMoved = updateGameArea(context);
         if (playerMoved){
           incrementMove()
         }
 
         const winCondition = checkWin();
+       
         if (winCondition) {
-          setHasPlayerWon(winCondition);
+          setHasPlayerWon(true);
           setShowPopup(true) // Trigger the popup when player wins
-        }
           context.key = false;
+        }
       }
     })
 
