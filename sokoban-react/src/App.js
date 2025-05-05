@@ -12,7 +12,7 @@ let player;
 
 const gridSize = 30;
 
-function GameArea({incrementMove, gameRef, level, setMoveCount, setSelectedLevel}) {
+function GameArea({moveCount, incrementMove, gameRef, level, setMoveCount, setSelectedLevel}) {
   const canvasRef = useRef(null);
   const gameInitialized = useRef(false);
   // let hasPlayerWon = useRef(false);
@@ -133,7 +133,8 @@ function GameArea({incrementMove, gameRef, level, setMoveCount, setSelectedLevel
     
   //   {gameRef.current.startNextLevel}
   // }
-
+  const winMessage = `Congratulations, you finished this level in ${moveCount} move${moveCount !== 1 ? 's' : ''}!`
+  
   return (
     <div className='gameArea'>
       <canvas ref={canvasRef}>GA</canvas>
@@ -142,7 +143,7 @@ function GameArea({incrementMove, gameRef, level, setMoveCount, setSelectedLevel
       {hasPlayerWon && showPopup &&(
         <Popup
           header="You Won!"
-          message="Congratulations, you have won the game!"
+          message={winMessage}
           buttonLeftText="Play Again"
           buttonRightText={
             getNextLevelIndex(gameRef.current.level.levelName) >= levels.length
@@ -529,7 +530,7 @@ function MainContainer() {
           setSelectedLevel={setSelectedLevel}
           currentLevel={selectedLevel}
         />
-        <GameArea incrementMove={incrementMove} gameRef={gameRef} level={selectedLevel} setMoveCount={setMoveCount} setSelectedLevel={setSelectedLevel}/>
+        <GameArea moveCount={moveCount} incrementMove={incrementMove} gameRef={gameRef} level={selectedLevel} setMoveCount={setMoveCount} setSelectedLevel={setSelectedLevel}/>
         {/* <div> */}
           {/* <MoveCounter moveCount={moveCount}/> */}
           {/* <button onClick = {restartLevel}>Restart</button> */}
