@@ -96,6 +96,10 @@ button :disabled{
   height: 100%;
 }
 
+.divLevelIndicator{
+  font-family: pixelatedFont;
+}
+
 .navVertical {
   flex-grow: 1;
   height:100%;

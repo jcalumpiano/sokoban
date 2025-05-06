@@ -36,6 +36,10 @@ function GameArea({moveCount, incrementMove, gameRef, level, setMoveCount, setSe
     function startGame(level){
       canvas.width = gameRef.current.level.canvasWidth * gridSize;
       canvas.height = gameRef.current.level.canvasHeight * gridSize;
+      setMoveCount(0)
+      setShowPopup(false);
+      gameInitialized.current = false;
+      context.key = false
       loadWallsFromTemplate(level.template, context).then(() => {
         setHasPlayerWon(false)
         updateGameArea(context);
@@ -138,7 +142,7 @@ function GameArea({moveCount, incrementMove, gameRef, level, setMoveCount, setSe
   return (
     <div className='gameArea'>
       <canvas ref={canvasRef}>GA</canvas>
-
+      <div className='divLevelIndicator'>{level.levelName}</div>
       {/* Conditionally render the popup when the player wins */}
       {hasPlayerWon && showPopup &&(
         <Popup
