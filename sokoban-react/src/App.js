@@ -189,7 +189,7 @@ function loadWallsFromTemplate(template, context) {
         } else if (trimmed === playerSymbol) {
           player = new Player(context, colIndex*gridSize, rowIndex*gridSize, "blue", gridSize, images.player);
         } else if (trimmed === boxSymbol) {
-          moveableBoxes.push(new MoveableBox(context, colIndex*gridSize, rowIndex*gridSize, "green", gridSize, "white", images.box, images.box))
+          moveableBoxes.push(new MoveableBox(context, colIndex*gridSize, rowIndex*gridSize, "green", gridSize, "white", images.box, images.markedBox))
         } else if (trimmed === targetSymbol) {
           targets.push(new Target(context, colIndex*gridSize, rowIndex*gridSize, "yellow", gridSize, images.target))
 
@@ -206,6 +206,7 @@ function preloadImages(){
     box: '/img/block.png',
     player: '/img/char.png',
     target: '/img/mark.png',
+    markedBox: '/img/blockmarked.png'
   };
 
   const loadedImages = {};
@@ -255,6 +256,7 @@ function checkWin(){
       for (let box of moveableBoxes){
           if (box.x == target.x && box.y == target.y){
               score = score + 1
+              box.markBox()
               continue;
           }
       }
