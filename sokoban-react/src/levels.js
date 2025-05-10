@@ -55,6 +55,7 @@ W,B,-,B,B,B,T,-,-,-,-,-,-,-,-,-,-
 )
 
 const levels = [level1, level2]
+
 const levelsIndexMap = new Map();
 
 for (const [index, level] of levels.entries()) {

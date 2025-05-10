@@ -4,7 +4,6 @@ import { Wall, Player, MoveableBox, Target} from './assets'
 import { levels, levelsIndexMap, getNextLevelIndex, getLevelByIndex, wallSymbol, boxSymbol, playerSymbol, targetSymbol} from './levels';
 import {Button, Popup, LevelSelector} from "./components"
 
-
 let wallBlocks = [];
 let moveableBoxes = [];
 let targets = [];
@@ -13,14 +12,14 @@ let player;
 const gridSize = 30;
 
 function GameArea({moveCount, incrementMove, gameRef, level, setMoveCount, setSelectedLevel}) {
+
   const canvasRef = useRef(null);
   const gameInitialized = useRef(false);
-  // let hasPlayerWon = useRef(false);
   let [hasPlayerWon, setHasPlayerWon] = useState(false);
   const [showPopup, setShowPopup] = useState(false)
 
-  const hasPlayerWonRef = useRef(hasPlayerWon);
   // update tracking of player status
+  const hasPlayerWonRef = useRef(hasPlayerWon);
   useEffect(() => {
     hasPlayerWonRef.current = hasPlayerWon;
 
@@ -69,7 +68,6 @@ function GameArea({moveCount, incrementMove, gameRef, level, setMoveCount, setSe
       // assign methods to the reference object
       // use updated level
       gameRef.current = { restartGame, startGame: () => startGame(gameRef.current.level), level, startNextLevel};
-
     }
 
     function updateGameArea(context){
@@ -78,7 +76,7 @@ function GameArea({moveCount, incrementMove, gameRef, level, setMoveCount, setSe
       if (playerMoved){         
           for(let target of targets){
             for (let box of moveableBoxes){
-                if (box.x == target.x && box.y == target.y){
+                if (box.x === target.x && box.y === target.y){
                     box.markBox();
                     continue;
                 }
@@ -86,10 +84,8 @@ function GameArea({moveCount, incrementMove, gameRef, level, setMoveCount, setSe
           }
       } 
       
-      
       drawWalls();
       return playerMoved;
-      // disableCurrentLevelButton();
     }
 
     function clearCanvas() {
@@ -123,7 +119,6 @@ function GameArea({moveCount, incrementMove, gameRef, level, setMoveCount, setSe
 
     startGame(level);
     gameInitialized.current = true;
-
     drawWalls();
 
   }, [])
@@ -132,17 +127,13 @@ function GameArea({moveCount, incrementMove, gameRef, level, setMoveCount, setSe
     setShowPopup(false);
   }
 
-  // const goToNextLevel = () => {
-    
-    
-  //   {gameRef.current.startNextLevel}
-  // }
   const winMessage = `Congratulations, you finished this level in ${moveCount} move${moveCount !== 1 ? 's' : ''}!`
   
   return (
     <div className='gameArea'>
       <canvas ref={canvasRef}>GA</canvas>
       <div className='divLevelIndicator'>{level.levelName}</div>
+      
       {/* Conditionally render the popup when the player wins */}
       {hasPlayerWon && showPopup &&(
         <Popup
@@ -165,10 +156,6 @@ function GameArea({moveCount, incrementMove, gameRef, level, setMoveCount, setSe
       )}
     </div>
   );
-}
-
-const playAgain = () => {
-  console.log('play again')
 }
 
 function loadWallsFromTemplate(template, context) {
@@ -231,47 +218,24 @@ function preloadImages(){
   return Promise.all(promises).then(() => loadedImages)
 }
 
-// function updateGameArea(context) {
-//   clearCanvas(context);
-//   let playerMoved = movePlayer(context);
-//   if (playerMoved){
-//     console.log("player moved")
-      
-//       for(let target of targets){
-//         for (let box of moveableBoxes){
-//             if (box.x == target.x && box.y == target.y){
-//                 box.markBox();
-//                 continue;
-//             }
-//         }
-//       }
-
-//   }
-  
-//   drawWalls();
-//   return playerMoved;
-//   // disableCurrentLevelButton();
-// } 
-
 function checkWin(){
   let score = 0;
   
   for(let target of targets){
       for (let box of moveableBoxes){
-          if (box.x == target.x && box.y == target.y){
+          if (box.x === target.x && box.y === target.y){
               score = score + 1
               box.markBox()
               continue;
           }
       }
   }
-  if (score == targets.length){
-    console.log("player won");
+
+  if (score === targets.length){
     return true;
   }
 
   return false
-
 }
 
 function movePlayer(context){
@@ -283,10 +247,10 @@ function movePlayer(context){
 
   let movement = ""
 
-  if (context.key && context.key == "ArrowLeft") {newX -= player.speedX; movement = "left"}
-  if (context.key && context.key == "ArrowRight") {newX += player.speedX; movement = "right"}
-  if (context.key && context.key == "ArrowUp") {newY -= player.speedY; movement = "up"}
-  if (context.key && context.key == "ArrowDown") {newY += player.speedY; movement = "down"}
+  if (context.key && context.key === "ArrowLeft") {newX -= player.speedX; movement = "left"}
+  if (context.key && context.key === "ArrowRight") {newX += player.speedX; movement = "right"}
+  if (context.key && context.key === "ArrowUp") {newY -= player.speedY; movement = "up"}
+  if (context.key && context.key === "ArrowDown") {newY += player.speedY; movement = "down"}
 
   // Check for collisions with blocks (walls)
   let isWallHit = isHittingWall(newX, newY)
@@ -319,8 +283,6 @@ function movePlayer(context){
   }
   return playerMoved
 
-
-    
 }
 
 function moveBox(context, box, newX, newY){
@@ -329,8 +291,8 @@ function moveBox(context, box, newX, newY){
   box.x = Math.max(0, Math.min(box.x, context.canvas.width - box.size))
   box.y = Math.max(0, Math.min(box.y, context.canvas.height - box.size))
 
-
   box.update()
+
 }
 
 function pushBox(context, movement, box){
@@ -373,7 +335,7 @@ function pushBox(context, movement, box){
 
 function isHittingWall(newX, newY){
   for(let wallBlock of wallBlocks){
-      if (newY == wallBlock.y && newX == wallBlock.x){
+      if (newY === wallBlock.y && newX === wallBlock.x){
           return true;
       }
   }
@@ -382,7 +344,7 @@ function isHittingWall(newX, newY){
 
 function isHittingBox(newX, newY){
   for(let box of moveableBoxes){
-      if (newX == box.x && newY == box.y){
+      if (newX === box.x && newY === box.y){
           return box;
       }
   }
@@ -390,10 +352,11 @@ function isHittingBox(newX, newY){
 }
 
 function isHittingOtherBox(box, newX, newY){
+  // check if a player moves a box into another box
   for(let otherbox of moveableBoxes){
-      if(box.id == otherbox.id){
+      if(box.id === otherbox.id){
           continue
-      }else if (newX == otherbox.x && newY == otherbox.y){
+      }else if (newX === otherbox.x && newY === otherbox.y){
           return true;
       }
   }
@@ -415,6 +378,14 @@ function drawWalls() {
   player.update();
 }
 
+
+
+
+
+
+
+
+
 function MoveCounter({moveCount}) {
 
   return (
@@ -434,10 +405,7 @@ function NavBar() {
 function NavLeft({gameRef, setSelectedLevel, currentLevel}) {
   const [showChangeLevelPopup, setShowChangeLevelPopup] = useState(false);
   const [pendingLevel, setPendingLevel] = useState(null);
-  // let oldLevel = gameRef.current.level
-  // console.log(currentLevel)
-  let newLevel;
-
+  
   const handleSelectLevel = (selectedLevel) => {
     setPendingLevel(selectedLevel);
     if(selectedLevel!=gameRef.current.level){
@@ -447,7 +415,6 @@ function NavLeft({gameRef, setSelectedLevel, currentLevel}) {
 
   const confirmChangeLevel = () => {
     if (gameRef.current && gameRef.current.startGame && pendingLevel) {
-      //pass level here
       setSelectedLevel(pendingLevel)
       gameRef.current.level = pendingLevel
       gameRef.current.startGame(pendingLevel)
@@ -520,12 +487,11 @@ function NavRight({moveCount, gameRef, setMoveCount}) {
 }
 
 function MainContainer() {
-  
-  // State for move count
   const gameRef = useRef(null);
   const [moveCount, setMoveCount] = useState(0);
-  const incrementMove = () => setMoveCount(prev => prev + 1);
   const [selectedLevel, setSelectedLevel] = useState(levels[0])
+
+  const incrementMove = () => setMoveCount(prev => prev + 1);
 
   return (
     <div className='mainContainer'>
@@ -536,12 +502,14 @@ function MainContainer() {
           setSelectedLevel={setSelectedLevel}
           currentLevel={selectedLevel}
         />
-        <GameArea moveCount={moveCount} incrementMove={incrementMove} gameRef={gameRef} level={selectedLevel} setMoveCount={setMoveCount} setSelectedLevel={setSelectedLevel}/>
-        {/* <div> */}
-          {/* <MoveCounter moveCount={moveCount}/> */}
-          {/* <button onClick = {restartLevel}>Restart</button> */}
-          {/* <Button text="Restart" id="restart" onclick={restartLevel} /> */}
-        {/* </div> */}
+        <GameArea 
+          moveCount={moveCount} 
+          incrementMove={incrementMove} 
+          gameRef={gameRef} 
+          level={selectedLevel} 
+          setMoveCount={setMoveCount} 
+          setSelectedLevel={setSelectedLevel}
+        />
         <NavRight
           moveCount={moveCount}
           gameRef={gameRef}
@@ -553,15 +521,11 @@ function MainContainer() {
   )
 }
 
-// Function to load walls (blocks) from CSV
-
-
 function App() {
   
   return (
     <div className="App">
       <MainContainer />
-      
     </div>
     
   );

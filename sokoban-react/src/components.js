@@ -1,7 +1,6 @@
 import { useState } from "react";
 import ReactDOM from 'react-dom';
 
-
 export function Button({text, id, onclick, className, isDisabled}){
     return (
         <button 
